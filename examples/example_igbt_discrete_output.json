@@ -1,0 +1,273 @@
+{
+  "device_type": "igbt_discrete",
+  "module_name": "IKW40N65H5",
+  "conditions": {
+    "vdc": 320.0,
+    "i_out_rms": 15.0,
+    "i_out_peak": null,
+    "f_out": 50.0,
+    "f_sw": 8000.0,
+    "modulation_index": 0.95,
+    "power_factor": 0.8,
+    "modulation": "spwm",
+    "t_ambient": 40.0,
+    "t_case": null,
+    "rth_ha": null
+  },
+  "p_total_loss": 119.82,
+  "p_igbt_cond": 71.56,
+  "p_igbt_sw": 34.5,
+  "p_diode_cond": 6.42,
+  "p_diode_sw": 7.34,
+  "p_brake_loss": 0.0,
+  "efficiency": 97.0,
+  "p_out": 3869.29,
+  "t_j_max": 250.0,
+  "t_j_max_device": "IGBT_H_U",
+  "t_case_est": 339.55,
+  "t_heatsink_est": 279.64,
+  "devices": [
+    {
+      "name": "IGBT_H_U",
+      "p_cond": 11.926,
+      "p_sw": 5.75,
+      "p_total": 17.676,
+      "t_j": 250.0,
+      "i_avg": 0.0,
+      "i_rms": 0.0,
+      "duty_cycle": 0.0,
+      "conduction_details": null,
+      "switching_details": null
+    },
+    {
+      "name": "IGBT_L_U",
+      "p_cond": 11.926,
+      "p_sw": 5.75,
+      "p_total": 17.676,
+      "t_j": 250.0,
+      "i_avg": 0.0,
+      "i_rms": 0.0,
+      "duty_cycle": 0.0,
+      "conduction_details": null,
+      "switching_details": null
+    },
+    {
+      "name": "Diode_H_U",
+      "p_cond": 1.07,
+      "p_sw": 1.223,
+      "p_total": 2.293,
+      "t_j": 250.0,
+      "i_avg": 0.0,
+      "i_rms": 0.0,
+      "duty_cycle": 0.0,
+      "conduction_details": null,
+      "switching_details": null
+    },
+    {
+      "name": "Diode_L_U",
+      "p_cond": 1.07,
+      "p_sw": 1.223,
+      "p_total": 2.293,
+      "t_j": 250.0,
+      "i_avg": 0.0,
+      "i_rms": 0.0,
+      "duty_cycle": 0.0,
+      "conduction_details": null,
+      "switching_details": null
+    },
+    {
+      "name": "IGBT_H_V",
+      "p_cond": 11.926,
+      "p_sw": 5.75,
+      "p_total": 17.676,
+      "t_j": 250.0,
+      "i_avg": 0.0,
+      "i_rms": 0.0,
+      "duty_cycle": 0.0,
+      "conduction_details": null,
+      "switching_details": null
+    },
+    {
+      "name": "IGBT_L_V",
+      "p_cond": 11.926,
+      "p_sw": 5.75,
+      "p_total": 17.676,
+      "t_j": 250.0,
+      "i_avg": 0.0,
+      "i_rms": 0.0,
+      "duty_cycle": 0.0,
+      "conduction_details": null,
+      "switching_details": null
+    },
+    {
+      "name": "Diode_H_V",
+      "p_cond": 1.07,
+      "p_sw": 1.223,
+      "p_total": 2.293,
+      "t_j": 250.0,
+      "i_avg": 0.0,
+      "i_rms": 0.0,
+      "duty_cycle": 0.0,
+      "conduction_details": null,
+      "switching_details": null
+    },
+    {
+      "name": "Diode_L_V",
+      "p_cond": 1.07,
+      "p_sw": 1.223,
+      "p_total": 2.293,
+      "t_j": 250.0,
+      "i_avg": 0.0,
+      "i_rms": 0.0,
+      "duty_cycle": 0.0,
+      "conduction_details": null,
+      "switching_details": null
+    },
+    {
+      "name": "IGBT_H_W",
+      "p_cond": 11.926,
+      "p_sw": 5.75,
+      "p_total": 17.676,
+      "t_j": 250.0,
+      "i_avg": 0.0,
+      "i_rms": 0.0,
+      "duty_cycle": 0.0,
+      "conduction_details": null,
+      "switching_details": null
+    },
+    {
+      "name": "IGBT_L_W",
+      "p_cond": 11.926,
+      "p_sw": 5.75,
+      "p_total": 17.676,
+      "t_j": 250.0,
+      "i_avg": 0.0,
+      "i_rms": 0.0,
+      "duty_cycle": 0.0,
+      "conduction_details": null,
+      "switching_details": null
+    },
+    {
+      "name": "Diode_H_W",
+      "p_cond": 1.07,
+      "p_sw": 1.223,
+      "p_total": 2.293,
+      "t_j": 250.0,
+      "i_avg": 0.0,
+      "i_rms": 0.0,
+      "duty_cycle": 0.0,
+      "conduction_details": null,
+      "switching_details": null
+    },
+    {
+      "name": "Diode_L_W",
+      "p_cond": 1.07,
+      "p_sw": 1.223,
+      "p_total": 2.293,
+      "t_j": 250.0,
+      "i_avg": 0.0,
+      "i_rms": 0.0,
+      "duty_cycle": 0.0,
+      "conduction_details": null,
+      "switching_details": null
+    }
+  ],
+  "iteration_count": 2,
+  "converged": true,
+  "calculation_steps": [
+    {
+      "title": "输入参数",
+      "type": "input",
+      "data": {
+        "直流母线电压 Vdc": "320.0 V",
+        "输出电流 RMS": "15.0 A",
+        "输出电流峰值 I_peak": "21.21 A",
+        "输出频率 f_out": "50.0 Hz",
+        "开关频率 f_sw": "8.00 kHz",
+        "调制比 m": "0.95",
+        "功率因数 cosφ": "0.8",
+        "环境温度 Tamb": "40.0 °C"
+      }
+    },
+    {
+      "title": "导通损耗计算",
+      "type": "calculation",
+      "formula": "Pcond_IGBT = Vce(sat)(Tj) × Ic × D(θ), 数值积分",
+      "data": {
+        "Vce(sat) @ Tj": "1.5 ~ 1.8 V",
+        "IGBT 导通损耗 (每相)": "23.852 W",
+        "IGBT 上管导通损耗": "11.926 W",
+        "IGBT 下管导通损耗": "11.926 W",
+        "IGBT 上管平均电流": "5.889 A",
+        "IGBT 上管RMS电流": "10.075 A",
+        "IGBT 上管等效占空比": "0.8027"
+      }
+    },
+    {
+      "title": "二极管导通损耗计算",
+      "type": "calculation",
+      "formula": "Pcond_Diode = Vf(Tj) × If × (1-D(θ)), 数值积分",
+      "data": {
+        "Vf @ Tj": "1.6 ~ 1.4 V",
+        "二极管导通损耗 (每相)": "2.141 W",
+        "二极管上管导通损耗": "1.070 W",
+        "二极管下管导通损耗": "1.070 W"
+      }
+    },
+    {
+      "title": "开关损耗计算",
+      "type": "calculation",
+      "formula": "Psw = f_sw × (Eon + Eoff) × (I/Iref)^Ki × (Vdc/Vref)^Kv",
+      "data": {
+        "平均Eon (每次开关)": "0.9154 mJ",
+        "平均Eoff (每次开关)": "0.5222 mJ",
+        "平均Err (每次开关)": "0.3058 mJ",
+        "IGBT开关损耗 (每相)": "11.501 W",
+        "二极管反向恢复损耗 (每相)": "2.446 W"
+      }
+    },
+    {
+      "title": "热迭代收敛过程 (2 次迭代)",
+      "type": "thermal",
+      "data": [
+        {
+          "iteration": 1,
+          "t_heatsink": 225.62,
+          "t_case": 272.03,
+          "t_j_igbt_h": 250.0,
+          "t_j_diode_h": 250.0,
+          "p_igbt_cond_per_leg": 19.61,
+          "p_igbt_sw_per_leg": 7.24,
+          "p_diode_cond_per_leg": 2.55,
+          "p_diode_sw_per_leg": 1.54,
+          "max_tj_change": 170.0
+        },
+        {
+          "iteration": 2,
+          "t_heatsink": 279.64,
+          "t_case": 339.55,
+          "t_j_igbt_h": 250.0,
+          "t_j_diode_h": 250.0,
+          "p_igbt_cond_per_leg": 23.85,
+          "p_igbt_sw_per_leg": 11.5,
+          "p_diode_cond_per_leg": 2.14,
+          "p_diode_sw_per_leg": 2.45,
+          "max_tj_change": 0.0
+        }
+      ]
+    },
+    {
+      "title": "总损耗汇总",
+      "type": "summary",
+      "data": {
+        "IGBT总导通损耗": "71.56 W",
+        "IGBT总开关损耗": "34.50 W",
+        "二极管总导通损耗": "6.42 W",
+        "二极管总开关损耗": "7.34 W",
+        "总损耗": "119.82 W",
+        "效率": "0.97%"
+      }
+    }
+  ],
+  "_description": "650V/40A IGBT 单管 — 小功率逆变器工况"
+}

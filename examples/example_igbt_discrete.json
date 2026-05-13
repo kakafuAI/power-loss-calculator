@@ -1,0 +1,68 @@
+{
+  "description": "650V/40A IGBT 单管 — 小功率逆变器工况",
+  "config": {
+    "device_type": "igbt_discrete",
+    "module_name": "IKW40N65H5",
+    "manufacturer": "Infineon",
+    "vdc_rated": 650,
+    "ic_rated": 40,
+    "num_parallel_chips": 1,
+    "t_j_max": 150,
+    "rth_ch_module": 0.5,
+    "rth_ha": 2.0,
+    "igbt": {
+      "vce_sat_25": 1.5,
+      "vce_sat_125": 1.8,
+      "ic_nom": 40,
+      "vce_rated": 650,
+      "eon_curve": {
+        "vcc": 400,
+        "rg": 10,
+        "tj": 125,
+        "points": [
+          {"current": 5, "energy": 0.3},
+          {"current": 20, "energy": 1.2},
+          {"current": 40, "energy": 2.8}
+        ]
+      },
+      "eoff_curve": {
+        "vcc": 400,
+        "rg": 10,
+        "tj": 125,
+        "points": [
+          {"current": 5, "energy": 0.15},
+          {"current": 20, "energy": 0.7},
+          {"current": 40, "energy": 1.6}
+        ]
+      },
+      "thermal": {"rth_jc": 1.0}
+    },
+    "diode": {
+      "vf_25": 1.6,
+      "vf_125": 1.4,
+      "if_nom": 40,
+      "err_curve": {
+        "vcc": 400,
+        "rg": 10,
+        "tj": 125,
+        "points": [
+          {"current": 5, "energy": 0.1},
+          {"current": 20, "energy": 0.4},
+          {"current": 40, "energy": 1.0}
+        ]
+      },
+      "qrr": 1.5,
+      "thermal": {"rth_jc": 1.5}
+    }
+  },
+  "conditions": {
+    "vdc": 320,
+    "i_out_rms": 15,
+    "f_out": 50,
+    "f_sw": 8000,
+    "modulation_index": 0.95,
+    "power_factor": 0.80,
+    "modulation": "spwm",
+    "t_ambient": 40
+  }
+}

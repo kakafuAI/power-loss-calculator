@@ -1,0 +1,297 @@
+{
+  "device_type": "sic_module",
+  "module_name": "CAB100M12XM3",
+  "conditions": {
+    "vdc": 800.0,
+    "i_out_rms": 40.0,
+    "i_out_peak": null,
+    "f_out": 100.0,
+    "f_sw": 20000.0,
+    "modulation_index": 0.95,
+    "power_factor": 0.95,
+    "modulation": "spwm",
+    "t_ambient": 50.0,
+    "t_case": null,
+    "rth_ha": null
+  },
+  "p_total_loss": 231.4,
+  "p_igbt_cond": 118.28,
+  "p_igbt_sw": 93.75,
+  "p_diode_cond": 19.36,
+  "p_diode_sw": 0.0,
+  "p_brake_loss": 0.0,
+  "efficiency": 99.25,
+  "p_out": 30631.87,
+  "t_j_max": 73.72,
+  "t_j_max_device": "IGBT_H_U",
+  "t_case_est": 67.35,
+  "t_heatsink_est": 63.88,
+  "devices": [
+    {
+      "name": "IGBT_H_U",
+      "p_cond": 19.713,
+      "p_sw": 15.626,
+      "p_total": 35.339,
+      "t_j": 73.72,
+      "i_avg": 0.0,
+      "i_rms": 0.0,
+      "duty_cycle": 0.0,
+      "conduction_details": null,
+      "switching_details": null
+    },
+    {
+      "name": "IGBT_L_U",
+      "p_cond": 19.713,
+      "p_sw": 15.626,
+      "p_total": 35.339,
+      "t_j": 73.72,
+      "i_avg": 0.0,
+      "i_rms": 0.0,
+      "duty_cycle": 0.0,
+      "conduction_details": null,
+      "switching_details": null
+    },
+    {
+      "name": "Diode_H_U",
+      "p_cond": 3.227,
+      "p_sw": 0.0,
+      "p_total": 3.227,
+      "t_j": 68.26,
+      "i_avg": 0.0,
+      "i_rms": 0.0,
+      "duty_cycle": 0.0,
+      "conduction_details": null,
+      "switching_details": null
+    },
+    {
+      "name": "Diode_L_U",
+      "p_cond": 3.227,
+      "p_sw": 0.0,
+      "p_total": 3.227,
+      "t_j": 68.26,
+      "i_avg": 0.0,
+      "i_rms": 0.0,
+      "duty_cycle": 0.0,
+      "conduction_details": null,
+      "switching_details": null
+    },
+    {
+      "name": "IGBT_H_V",
+      "p_cond": 19.713,
+      "p_sw": 15.626,
+      "p_total": 35.339,
+      "t_j": 73.72,
+      "i_avg": 0.0,
+      "i_rms": 0.0,
+      "duty_cycle": 0.0,
+      "conduction_details": null,
+      "switching_details": null
+    },
+    {
+      "name": "IGBT_L_V",
+      "p_cond": 19.713,
+      "p_sw": 15.626,
+      "p_total": 35.339,
+      "t_j": 73.72,
+      "i_avg": 0.0,
+      "i_rms": 0.0,
+      "duty_cycle": 0.0,
+      "conduction_details": null,
+      "switching_details": null
+    },
+    {
+      "name": "Diode_H_V",
+      "p_cond": 3.227,
+      "p_sw": 0.0,
+      "p_total": 3.227,
+      "t_j": 68.26,
+      "i_avg": 0.0,
+      "i_rms": 0.0,
+      "duty_cycle": 0.0,
+      "conduction_details": null,
+      "switching_details": null
+    },
+    {
+      "name": "Diode_L_V",
+      "p_cond": 3.227,
+      "p_sw": 0.0,
+      "p_total": 3.227,
+      "t_j": 68.26,
+      "i_avg": 0.0,
+      "i_rms": 0.0,
+      "duty_cycle": 0.0,
+      "conduction_details": null,
+      "switching_details": null
+    },
+    {
+      "name": "IGBT_H_W",
+      "p_cond": 19.713,
+      "p_sw": 15.626,
+      "p_total": 35.339,
+      "t_j": 73.72,
+      "i_avg": 0.0,
+      "i_rms": 0.0,
+      "duty_cycle": 0.0,
+      "conduction_details": null,
+      "switching_details": null
+    },
+    {
+      "name": "IGBT_L_W",
+      "p_cond": 19.713,
+      "p_sw": 15.626,
+      "p_total": 35.339,
+      "t_j": 73.72,
+      "i_avg": 0.0,
+      "i_rms": 0.0,
+      "duty_cycle": 0.0,
+      "conduction_details": null,
+      "switching_details": null
+    },
+    {
+      "name": "Diode_H_W",
+      "p_cond": 3.227,
+      "p_sw": 0.0,
+      "p_total": 3.227,
+      "t_j": 68.26,
+      "i_avg": 0.0,
+      "i_rms": 0.0,
+      "duty_cycle": 0.0,
+      "conduction_details": null,
+      "switching_details": null
+    },
+    {
+      "name": "Diode_L_W",
+      "p_cond": 3.227,
+      "p_sw": 0.0,
+      "p_total": 3.227,
+      "t_j": 68.26,
+      "i_avg": 0.0,
+      "i_rms": 0.0,
+      "duty_cycle": 0.0,
+      "conduction_details": null,
+      "switching_details": null
+    }
+  ],
+  "iteration_count": 4,
+  "converged": true,
+  "calculation_steps": [
+    {
+      "title": "输入参数",
+      "type": "input",
+      "data": {
+        "直流母线电压 Vdc": "800.0 V",
+        "输出电流 RMS": "40.0 A",
+        "输出电流峰值 I_peak": "56.57 A",
+        "输出频率 f_out": "100.0 Hz",
+        "开关频率 f_sw": "20.00 kHz",
+        "调制比 m": "0.95",
+        "功率因数 cosφ": "0.95",
+        "环境温度 Tamb": "50.0 °C"
+      }
+    },
+    {
+      "title": "导通损耗计算",
+      "type": "calculation",
+      "formula": "Pcond_IGBT = Vce(sat)(Tj) × Ic × D(θ), 数值积分",
+      "data": {
+        "Vce(sat) @ Tj": "0.0 ~ 0.0 V",
+        "IGBT 导通损耗 (每相)": "39.426 W",
+        "IGBT 上管导通损耗": "19.713 W",
+        "IGBT 下管导通损耗": "19.713 W",
+        "IGBT 上管平均电流": "15.705 A",
+        "IGBT 上管RMS电流": "26.867 A",
+        "IGBT 上管等效占空比": "0.8027"
+      }
+    },
+    {
+      "title": "二极管导通损耗计算",
+      "type": "calculation",
+      "formula": "Pcond_Diode = Vf(Tj) × If × (1-D(θ)), 数值积分",
+      "data": {
+        "Vf @ Tj": "0.0 ~ 0.0 V",
+        "二极管导通损耗 (每相)": "6.455 W",
+        "二极管上管导通损耗": "3.227 W",
+        "二极管下管导通损耗": "3.227 W"
+      }
+    },
+    {
+      "title": "开关损耗计算",
+      "type": "calculation",
+      "formula": "Psw = f_sw × (Eon + Eoff) × (I/Iref)^Ki × (Vdc/Vref)^Kv",
+      "data": {
+        "平均Eon (每次开关)": "0.9353 mJ",
+        "平均Eoff (每次开关)": "0.6273 mJ",
+        "平均Err (每次开关)": "0.0000 mJ",
+        "IGBT开关损耗 (每相)": "31.252 W",
+        "二极管反向恢复损耗 (每相)": "0.000 W"
+      }
+    },
+    {
+      "title": "热迭代收敛过程 (4 次迭代)",
+      "type": "thermal",
+      "data": [
+        {
+          "iteration": 1,
+          "t_heatsink": 64.81,
+          "t_case": 68.51,
+          "t_j_igbt_h": 75.35,
+          "t_j_diode_h": 69.38,
+          "p_igbt_cond_per_leg": 42.95,
+          "p_igbt_sw_per_leg": 33.05,
+          "p_diode_cond_per_leg": 6.26,
+          "p_diode_sw_per_leg": 0.0,
+          "max_tj_change": 20.6157
+        },
+        {
+          "iteration": 2,
+          "t_heatsink": 63.98,
+          "t_case": 67.47,
+          "t_j_igbt_h": 73.88,
+          "t_j_diode_h": 68.37,
+          "p_igbt_cond_per_leg": 39.78,
+          "p_igbt_sw_per_leg": 31.43,
+          "p_diode_cond_per_leg": 6.44,
+          "p_diode_sw_per_leg": 0.0,
+          "max_tj_change": 1.4684
+        },
+        {
+          "iteration": 3,
+          "t_heatsink": 63.89,
+          "t_case": 67.37,
+          "t_j_igbt_h": 73.73,
+          "t_j_diode_h": 68.27,
+          "p_igbt_cond_per_leg": 39.46,
+          "p_igbt_sw_per_leg": 31.27,
+          "p_diode_cond_per_leg": 6.45,
+          "p_diode_sw_per_leg": 0.0,
+          "max_tj_change": 0.1493
+        },
+        {
+          "iteration": 4,
+          "t_heatsink": 63.88,
+          "t_case": 67.35,
+          "t_j_igbt_h": 73.72,
+          "t_j_diode_h": 68.26,
+          "p_igbt_cond_per_leg": 39.43,
+          "p_igbt_sw_per_leg": 31.25,
+          "p_diode_cond_per_leg": 6.45,
+          "p_diode_sw_per_leg": 0.0,
+          "max_tj_change": 0.0152
+        }
+      ]
+    },
+    {
+      "title": "总损耗汇总",
+      "type": "summary",
+      "data": {
+        "IGBT总导通损耗": "118.28 W",
+        "IGBT总开关损耗": "93.75 W",
+        "二极管总导通损耗": "19.36 W",
+        "二极管总开关损耗": "0.00 W",
+        "总损耗": "231.40 W",
+        "效率": "0.99%"
+      }
+    }
+  ],
+  "_description": "1200V/100A SiC MOSFET 模块 — 高频 OBC 工况"
+}

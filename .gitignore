@@ -1,0 +1,19 @@
+node_modules/
+dist/
+__pycache__/
+*.pyc
+*.pyo
+.venv/
+venv/
+*.egg-info/
+.claude/
+*.log
+.env
+.DS_Store
+
+# Exclude unrelated experiments
+lcsc_*
+package.json
+package-lock.json
+.npmrc
+spikes/

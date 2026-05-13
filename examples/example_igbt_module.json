@@ -1,0 +1,68 @@
+{
+  "description": "1200V/100A IGBT 模块 — 典型变频器工况",
+  "config": {
+    "device_type": "igbt_module",
+    "module_name": "FS100R12KT4",
+    "manufacturer": "Infineon",
+    "vdc_rated": 1200,
+    "ic_rated": 100,
+    "num_parallel_chips": 1,
+    "t_j_max": 150,
+    "rth_ch_module": 0.02,
+    "rth_ha": 0.08,
+    "igbt": {
+      "vce_sat_25": 1.7,
+      "vce_sat_125": 2.0,
+      "ic_nom": 100,
+      "vce_rated": 1200,
+      "eon_curve": {
+        "vcc": 600,
+        "rg": 10,
+        "tj": 125,
+        "points": [
+          {"current": 10, "energy": 5.0},
+          {"current": 50, "energy": 25.0},
+          {"current": 100, "energy": 55.0}
+        ]
+      },
+      "eoff_curve": {
+        "vcc": 600,
+        "rg": 10,
+        "tj": 125,
+        "points": [
+          {"current": 10, "energy": 3.0},
+          {"current": 50, "energy": 15.0},
+          {"current": 100, "energy": 35.0}
+        ]
+      },
+      "thermal": {"rth_jc": 0.24}
+    },
+    "diode": {
+      "vf_25": 1.8,
+      "vf_125": 1.6,
+      "if_nom": 100,
+      "err_curve": {
+        "vcc": 600,
+        "rg": 10,
+        "tj": 125,
+        "points": [
+          {"current": 10, "energy": 2.0},
+          {"current": 50, "energy": 10.0},
+          {"current": 100, "energy": 22.0}
+        ]
+      },
+      "qrr": 5.0,
+      "thermal": {"rth_jc": 0.42}
+    }
+  },
+  "conditions": {
+    "vdc": 600,
+    "i_out_rms": 50,
+    "f_out": 50,
+    "f_sw": 4000,
+    "modulation_index": 1.0,
+    "power_factor": 0.85,
+    "modulation": "spwm",
+    "t_ambient": 40
+  }
+}
