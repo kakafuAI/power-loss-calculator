@@ -178,6 +178,79 @@ MANUFACTURER_PATTERNS = [
 ]
 
 
+# ── v1.2.0 新增 ────────────────────────────────────────────────────
+
+# Internal gate resistance
+RG_INT_PATTERNS = [
+    re.compile(r'(?:Internal|Rg\s*\(?\s*int\s*\)?|Gate\s*resistor).*?([\d.]+)\s*Ω', re.IGNORECASE),
+    re.compile(r'Rg\s*\(?\s*int\s*\)?\s*.*?(?:typ|Typ)\s*\.?\s*([\d.]+)\s*Ω', re.IGNORECASE),
+]
+
+# Maximum junction temperature
+TJ_MAX_PATTERNS = [
+    re.compile(r'(?:Tj\s*(?:max|op|_max)|junction\s*temp.*?max|operating\s*junction).*?([\d.]+)\s*°?C', re.IGNORECASE),
+    re.compile(r'virtual\s*junction\s*temp.*?([\d.]+)\s*°?C', re.IGNORECASE),
+    re.compile(r'Tvj\s*(?:max|op)\s*.*?([\d.]+)\s*°?C', re.IGNORECASE),
+]
+
+# Switching times
+TON_PATTERN = re.compile(r'(?:ton|t_on|turn[- ]on.*?(?:time|delay)).*?(?:typ|Typ)\s*\.?\s*([\d.]+)\s*ns', re.IGNORECASE)
+TOFF_PATTERN = re.compile(r'(?:toff|t_off|turn[- ]off.*?(?:time|delay)).*?(?:typ|Typ)\s*\.?\s*([\d.]+)\s*ns', re.IGNORECASE)
+TR_PATTERN = re.compile(r'(?:tr|t_r|rise\s*time).*?(?:typ|Typ)\s*\.?\s*([\d.]+)\s*ns', re.IGNORECASE)
+TF_PATTERN = re.compile(r'(?:tf|t_f|fall\s*time).*?(?:typ|Typ)\s*\.?\s*([\d.]+)\s*ns', re.IGNORECASE)
+
+# Input capacitance
+CIES_PATTERN = re.compile(r'C(?:ies|iss)\s*.*?(?:typ|Typ)\s*\.?\s*([\d.]+)\s*n?F', re.IGNORECASE)
+COES_PATTERN = re.compile(r'C(?:oes|oss)\s*.*?(?:typ|Typ)\s*\.?\s*([\d.]+)\s*n?F', re.IGNORECASE)
+CRES_PATTERN = re.compile(r'C(?:res|rss)\s*.*?(?:typ|Typ)\s*\.?\s*([\d.]+)\s*n?F', re.IGNORECASE)
+
+# Gate charge
+QG_PATTERN = re.compile(r'Qg?\s*.*?(?:typ|Typ)\s*\.?\s*([\d.]+)\s*n?C', re.IGNORECASE)
+
+# Thermal resistance with/without thermal grease
+RTH_CS_GREASE = re.compile(
+    r'Rth?\s*\(\s*c\s*-\s*s\s*\).*?(?:grease|paste|thermal\s*compound).*?([\d.]+)\s*K?\s*/?\s*W',
+    re.IGNORECASE,
+)
+
+# Multi-point switching energy extraction from table rows
+# Matches table lines like: "| 100 | — | 15.0 | — | mJ |"
+SWITCHING_TABLE_ROW = re.compile(
+    r'^\s*\|?\s*([\d.]+)\s*\|.*?\|?\s*([\d.]+)\s*\|?\s*(?:mJ)?\s*$',
+    re.MULTILINE,
+)
+
+
+def extract_table_rows(text: str, symbol: str) -> list[tuple[float, float]]:
+    """
+    Extract (current, energy) pairs from a switching characteristics table.
+
+    Args:
+        text: Table section text
+        symbol: 'Eon', 'Eoff', or 'Err' to find the right sub-table
+
+    Returns list of (current_A, energy_mJ) tuples.
+    """
+    rows = []
+    # Find section containing the symbol
+    symbol_idx = text.lower().find(symbol.lower())
+    if symbol_idx < 0:
+        return rows
+
+    # Search next ~500 chars for table rows
+    section = text[symbol_idx:symbol_idx + 800]
+    for match in SWITCHING_TABLE_ROW.finditer(section):
+        try:
+            current = float(match.group(1))
+            energy = float(match.group(2))
+            # Sanity: current 1-2000A, energy 0.01-500mJ
+            if 1 <= current <= 2000 and 0.01 <= energy <= 500:
+                rows.append((current, energy))
+        except (ValueError, IndexError):
+            continue
+    return rows
+
+
 def extract_float(text: str, pattern: re.Pattern) -> Optional[float]:
     """Extract first float value matched by pattern."""
     match = pattern.search(text)

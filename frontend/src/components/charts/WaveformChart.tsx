@@ -7,7 +7,7 @@ interface Props {
 }
 
 export default function WaveformChart({ conditions }: Props) {
-  const { data, dutyData } = useMemo(() => {
+  const { data } = useMemo(() => {
     const n = 200;
     const theta = Array.from({ length: n }, (_, i) => (2 * Math.PI * i) / n);
     const m = conditions.modulation_index;
@@ -27,7 +27,6 @@ export default function WaveformChart({ conditions }: Props) {
         iaAbs: iaAbs[i],
         dutyH: dutyH[i],
       })),
-      dutyData,
     };
   }, [conditions]);
 

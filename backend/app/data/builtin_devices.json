@@ -1,0 +1,1753 @@
+{
+  "version": "1.2.0",
+  "device_count": 20,
+  "devices": [
+    {
+      "name": "FS25R12W1T4",
+      "manufacturer": "Infineon",
+      "device_type": "igbt_module",
+      "vdc_rated": 1200,
+      "ic_rated": 25,
+      "config": {
+        "device_type": "igbt_module",
+        "module_name": "FS25R12W1T4",
+        "manufacturer": "Infineon",
+        "vdc_rated": 1200,
+        "ic_rated": 25,
+        "num_parallel_chips": 1,
+        "t_j_max": 150,
+        "rth_ch_module": 0.02,
+        "rth_ha": 0.08,
+        "igbt": {
+          "vce_sat_25": 1.65,
+          "vce_sat_125": 1.95,
+          "ic_nom": 25,
+          "vce_rated": 1200,
+          "eon_curve": {
+            "vcc": 600,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                5,
+                0.6
+              ],
+              [
+                10,
+                1.4
+              ],
+              [
+                25,
+                3.8
+              ]
+            ]
+          },
+          "eoff_curve": {
+            "vcc": 600,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                5,
+                0.4
+              ],
+              [
+                10,
+                0.9
+              ],
+              [
+                25,
+                2.5
+              ]
+            ]
+          },
+          "thermal": {
+            "rth_jc": 0.6
+          }
+        },
+        "diode": {
+          "vf_25": 1.7,
+          "vf_125": 1.5,
+          "if_nom": 25,
+          "err_curve": {
+            "vcc": 600,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                5,
+                0.25
+              ],
+              [
+                10,
+                0.55
+              ],
+              [
+                25,
+                1.5
+              ]
+            ]
+          },
+          "qrr": 0.6000000000000001,
+          "thermal": {
+            "rth_jc": 0.9
+          }
+        }
+      }
+    },
+    {
+      "name": "FS50R12KT4",
+      "manufacturer": "Infineon",
+      "device_type": "igbt_module",
+      "vdc_rated": 1200,
+      "ic_rated": 50,
+      "config": {
+        "device_type": "igbt_module",
+        "module_name": "FS50R12KT4",
+        "manufacturer": "Infineon",
+        "vdc_rated": 1200,
+        "ic_rated": 50,
+        "num_parallel_chips": 1,
+        "t_j_max": 150,
+        "rth_ch_module": 0.02,
+        "rth_ha": 0.08,
+        "igbt": {
+          "vce_sat_25": 1.7,
+          "vce_sat_125": 2.0,
+          "ic_nom": 50,
+          "vce_rated": 1200,
+          "eon_curve": {
+            "vcc": 600,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                10,
+                2.5
+              ],
+              [
+                25,
+                7.0
+              ],
+              [
+                50,
+                15
+              ]
+            ]
+          },
+          "eoff_curve": {
+            "vcc": 600,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                10,
+                1.5
+              ],
+              [
+                25,
+                4.2
+              ],
+              [
+                50,
+                9.5
+              ]
+            ]
+          },
+          "thermal": {
+            "rth_jc": 0.35
+          }
+        },
+        "diode": {
+          "vf_25": 1.8,
+          "vf_125": 1.55,
+          "if_nom": 50,
+          "err_curve": {
+            "vcc": 600,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                10,
+                1.0
+              ],
+              [
+                25,
+                2.8
+              ],
+              [
+                50,
+                6.5
+              ]
+            ]
+          },
+          "qrr": 2.6,
+          "thermal": {
+            "rth_jc": 0.55
+          }
+        }
+      }
+    },
+    {
+      "name": "FS100R12KT4",
+      "manufacturer": "Infineon",
+      "device_type": "igbt_module",
+      "vdc_rated": 1200,
+      "ic_rated": 100,
+      "config": {
+        "device_type": "igbt_module",
+        "module_name": "FS100R12KT4",
+        "manufacturer": "Infineon",
+        "vdc_rated": 1200,
+        "ic_rated": 100,
+        "num_parallel_chips": 1,
+        "t_j_max": 150,
+        "rth_ch_module": 0.02,
+        "rth_ha": 0.08,
+        "igbt": {
+          "vce_sat_25": 1.7,
+          "vce_sat_125": 2.0,
+          "ic_nom": 100,
+          "vce_rated": 1200,
+          "eon_curve": {
+            "vcc": 600,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                10,
+                5.0
+              ],
+              [
+                50,
+                25.0
+              ],
+              [
+                100,
+                55
+              ]
+            ]
+          },
+          "eoff_curve": {
+            "vcc": 600,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                10,
+                3.0
+              ],
+              [
+                50,
+                15.0
+              ],
+              [
+                100,
+                35
+              ]
+            ]
+          },
+          "thermal": {
+            "rth_jc": 0.24
+          }
+        },
+        "diode": {
+          "vf_25": 1.8,
+          "vf_125": 1.6,
+          "if_nom": 100,
+          "err_curve": {
+            "vcc": 600,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                10,
+                2.0
+              ],
+              [
+                50,
+                10.0
+              ],
+              [
+                100,
+                22
+              ]
+            ]
+          },
+          "qrr": 8.8,
+          "thermal": {
+            "rth_jc": 0.42
+          }
+        }
+      }
+    },
+    {
+      "name": "FS150R12KT4",
+      "manufacturer": "Infineon",
+      "device_type": "igbt_module",
+      "vdc_rated": 1200,
+      "ic_rated": 150,
+      "config": {
+        "device_type": "igbt_module",
+        "module_name": "FS150R12KT4",
+        "manufacturer": "Infineon",
+        "vdc_rated": 1200,
+        "ic_rated": 150,
+        "num_parallel_chips": 1,
+        "t_j_max": 150,
+        "rth_ch_module": 0.02,
+        "rth_ha": 0.08,
+        "igbt": {
+          "vce_sat_25": 1.7,
+          "vce_sat_125": 2.1,
+          "ic_nom": 150,
+          "vce_rated": 1200,
+          "eon_curve": {
+            "vcc": 600,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                30,
+                7.0
+              ],
+              [
+                75,
+                22.0
+              ],
+              [
+                150,
+                48
+              ]
+            ]
+          },
+          "eoff_curve": {
+            "vcc": 600,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                30,
+                4.5
+              ],
+              [
+                75,
+                13.0
+              ],
+              [
+                150,
+                30
+              ]
+            ]
+          },
+          "thermal": {
+            "rth_jc": 0.18
+          }
+        },
+        "diode": {
+          "vf_25": 1.75,
+          "vf_125": 1.55,
+          "if_nom": 150,
+          "err_curve": {
+            "vcc": 600,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                30,
+                3.0
+              ],
+              [
+                75,
+                9.0
+              ],
+              [
+                150,
+                20
+              ]
+            ]
+          },
+          "qrr": 8.0,
+          "thermal": {
+            "rth_jc": 0.33
+          }
+        }
+      }
+    },
+    {
+      "name": "FP25R12W2T4",
+      "manufacturer": "Infineon",
+      "device_type": "igbt_module",
+      "vdc_rated": 1200,
+      "ic_rated": 25,
+      "config": {
+        "device_type": "igbt_module",
+        "module_name": "FP25R12W2T4",
+        "manufacturer": "Infineon",
+        "vdc_rated": 1200,
+        "ic_rated": 25,
+        "num_parallel_chips": 1,
+        "t_j_max": 150,
+        "rth_ch_module": 0.02,
+        "rth_ha": 0.08,
+        "igbt": {
+          "vce_sat_25": 1.65,
+          "vce_sat_125": 1.95,
+          "ic_nom": 25,
+          "vce_rated": 1200,
+          "eon_curve": {
+            "vcc": 600,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                5,
+                0.55
+              ],
+              [
+                10,
+                1.3
+              ],
+              [
+                25,
+                3.5
+              ]
+            ]
+          },
+          "eoff_curve": {
+            "vcc": 600,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                5,
+                0.35
+              ],
+              [
+                10,
+                0.85
+              ],
+              [
+                25,
+                2.3
+              ]
+            ]
+          },
+          "thermal": {
+            "rth_jc": 0.6
+          }
+        },
+        "diode": {
+          "vf_25": 1.7,
+          "vf_125": 1.5,
+          "if_nom": 25,
+          "err_curve": {
+            "vcc": 600,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                5,
+                0.22
+              ],
+              [
+                10,
+                0.5
+              ],
+              [
+                25,
+                1.4
+              ]
+            ]
+          },
+          "qrr": 0.5599999999999999,
+          "thermal": {
+            "rth_jc": 0.9
+          }
+        }
+      }
+    },
+    {
+      "name": "FP50R12KT4",
+      "manufacturer": "Infineon",
+      "device_type": "igbt_module",
+      "vdc_rated": 1200,
+      "ic_rated": 50,
+      "config": {
+        "device_type": "igbt_module",
+        "module_name": "FP50R12KT4",
+        "manufacturer": "Infineon",
+        "vdc_rated": 1200,
+        "ic_rated": 50,
+        "num_parallel_chips": 1,
+        "t_j_max": 150,
+        "rth_ch_module": 0.02,
+        "rth_ha": 0.08,
+        "igbt": {
+          "vce_sat_25": 1.7,
+          "vce_sat_125": 2.0,
+          "ic_nom": 50,
+          "vce_rated": 1200,
+          "eon_curve": {
+            "vcc": 600,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                10,
+                2.5
+              ],
+              [
+                25,
+                7.0
+              ],
+              [
+                50,
+                15
+              ]
+            ]
+          },
+          "eoff_curve": {
+            "vcc": 600,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                10,
+                1.5
+              ],
+              [
+                25,
+                4.2
+              ],
+              [
+                50,
+                9.5
+              ]
+            ]
+          },
+          "thermal": {
+            "rth_jc": 0.35
+          }
+        },
+        "diode": {
+          "vf_25": 1.8,
+          "vf_125": 1.55,
+          "if_nom": 50,
+          "err_curve": {
+            "vcc": 600,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                10,
+                1.0
+              ],
+              [
+                25,
+                2.8
+              ],
+              [
+                50,
+                6.5
+              ]
+            ]
+          },
+          "qrr": 2.6,
+          "thermal": {
+            "rth_jc": 0.55
+          }
+        }
+      }
+    },
+    {
+      "name": "PM50RLA120",
+      "manufacturer": "Mitsubishi",
+      "device_type": "igbt_module",
+      "vdc_rated": 1200,
+      "ic_rated": 50,
+      "config": {
+        "device_type": "igbt_module",
+        "module_name": "PM50RLA120",
+        "manufacturer": "Mitsubishi",
+        "vdc_rated": 1200,
+        "ic_rated": 50,
+        "num_parallel_chips": 1,
+        "t_j_max": 150,
+        "rth_ch_module": 0.02,
+        "rth_ha": 0.08,
+        "igbt": {
+          "vce_sat_25": 1.8,
+          "vce_sat_125": 2.2,
+          "ic_nom": 50,
+          "vce_rated": 1200,
+          "eon_curve": {
+            "vcc": 600,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                10,
+                3.0
+              ],
+              [
+                25,
+                8.0
+              ],
+              [
+                50,
+                18
+              ]
+            ]
+          },
+          "eoff_curve": {
+            "vcc": 600,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                10,
+                1.8
+              ],
+              [
+                25,
+                5.0
+              ],
+              [
+                50,
+                11
+              ]
+            ]
+          },
+          "thermal": {
+            "rth_jc": 0.38
+          },
+          "rg_int": 3.7
+        },
+        "diode": {
+          "vf_25": 1.9,
+          "vf_125": 1.65,
+          "if_nom": 50,
+          "err_curve": {
+            "vcc": 600,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                10,
+                1.2
+              ],
+              [
+                25,
+                3.2
+              ],
+              [
+                50,
+                7.5
+              ]
+            ]
+          },
+          "qrr": 3.0,
+          "thermal": {
+            "rth_jc": 0.58
+          }
+        }
+      }
+    },
+    {
+      "name": "7MBR50VA120-50",
+      "manufacturer": "Fuji Electric",
+      "device_type": "igbt_module",
+      "vdc_rated": 1200,
+      "ic_rated": 50,
+      "config": {
+        "device_type": "igbt_module",
+        "module_name": "7MBR50VA120-50",
+        "manufacturer": "Fuji Electric",
+        "vdc_rated": 1200,
+        "ic_rated": 50,
+        "num_parallel_chips": 1,
+        "t_j_max": 150,
+        "rth_ch_module": 0.02,
+        "rth_ha": 0.08,
+        "igbt": {
+          "vce_sat_25": 1.75,
+          "vce_sat_125": 2.1,
+          "ic_nom": 50,
+          "vce_rated": 1200,
+          "eon_curve": {
+            "vcc": 600,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                10,
+                2.8
+              ],
+              [
+                25,
+                7.5
+              ],
+              [
+                50,
+                16
+              ]
+            ]
+          },
+          "eoff_curve": {
+            "vcc": 600,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                10,
+                1.6
+              ],
+              [
+                25,
+                4.5
+              ],
+              [
+                50,
+                10
+              ]
+            ]
+          },
+          "thermal": {
+            "rth_jc": 0.36
+          }
+        },
+        "diode": {
+          "vf_25": 1.85,
+          "vf_125": 1.6,
+          "if_nom": 50,
+          "err_curve": {
+            "vcc": 600,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                10,
+                1.1
+              ],
+              [
+                25,
+                3.0
+              ],
+              [
+                50,
+                7.0
+              ]
+            ]
+          },
+          "qrr": 2.8000000000000003,
+          "thermal": {
+            "rth_jc": 0.56
+          }
+        }
+      }
+    },
+    {
+      "name": "SKM50GB12T4",
+      "manufacturer": "Semikron",
+      "device_type": "igbt_module",
+      "vdc_rated": 1200,
+      "ic_rated": 50,
+      "config": {
+        "device_type": "igbt_module",
+        "module_name": "SKM50GB12T4",
+        "manufacturer": "Semikron",
+        "vdc_rated": 1200,
+        "ic_rated": 50,
+        "num_parallel_chips": 1,
+        "t_j_max": 150,
+        "rth_ch_module": 0.02,
+        "rth_ha": 0.08,
+        "igbt": {
+          "vce_sat_25": 1.7,
+          "vce_sat_125": 2.0,
+          "ic_nom": 50,
+          "vce_rated": 1200,
+          "eon_curve": {
+            "vcc": 600,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                10,
+                2.5
+              ],
+              [
+                25,
+                7.0
+              ],
+              [
+                50,
+                15
+              ]
+            ]
+          },
+          "eoff_curve": {
+            "vcc": 600,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                10,
+                1.5
+              ],
+              [
+                25,
+                4.2
+              ],
+              [
+                50,
+                9.5
+              ]
+            ]
+          },
+          "thermal": {
+            "rth_jc": 0.34
+          }
+        },
+        "diode": {
+          "vf_25": 1.8,
+          "vf_125": 1.55,
+          "if_nom": 50,
+          "err_curve": {
+            "vcc": 600,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                10,
+                1.0
+              ],
+              [
+                25,
+                2.8
+              ],
+              [
+                50,
+                6.5
+              ]
+            ]
+          },
+          "qrr": 2.6,
+          "thermal": {
+            "rth_jc": 0.54
+          }
+        }
+      }
+    },
+    {
+      "name": "SKM100GB12T4",
+      "manufacturer": "Semikron",
+      "device_type": "igbt_module",
+      "vdc_rated": 1200,
+      "ic_rated": 100,
+      "config": {
+        "device_type": "igbt_module",
+        "module_name": "SKM100GB12T4",
+        "manufacturer": "Semikron",
+        "vdc_rated": 1200,
+        "ic_rated": 100,
+        "num_parallel_chips": 1,
+        "t_j_max": 150,
+        "rth_ch_module": 0.02,
+        "rth_ha": 0.08,
+        "igbt": {
+          "vce_sat_25": 1.7,
+          "vce_sat_125": 2.05,
+          "ic_nom": 100,
+          "vce_rated": 1200,
+          "eon_curve": {
+            "vcc": 600,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                10,
+                5.0
+              ],
+              [
+                50,
+                25.0
+              ],
+              [
+                100,
+                56
+              ]
+            ]
+          },
+          "eoff_curve": {
+            "vcc": 600,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                10,
+                3.0
+              ],
+              [
+                50,
+                15.0
+              ],
+              [
+                100,
+                36
+              ]
+            ]
+          },
+          "thermal": {
+            "rth_jc": 0.23
+          }
+        },
+        "diode": {
+          "vf_25": 1.8,
+          "vf_125": 1.6,
+          "if_nom": 100,
+          "err_curve": {
+            "vcc": 600,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                10,
+                2.0
+              ],
+              [
+                50,
+                10.0
+              ],
+              [
+                100,
+                23
+              ]
+            ]
+          },
+          "qrr": 9.200000000000001,
+          "thermal": {
+            "rth_jc": 0.41
+          }
+        }
+      }
+    },
+    {
+      "name": "CAB100M12XM3",
+      "manufacturer": "Wolfspeed",
+      "device_type": "sic_module",
+      "vdc_rated": 1200,
+      "ic_rated": 100,
+      "config": {
+        "device_type": "sic_module",
+        "module_name": "CAB100M12XM3",
+        "manufacturer": "Wolfspeed",
+        "vdc_rated": 1200,
+        "ic_rated": 100,
+        "num_parallel_chips": 1,
+        "t_j_max": 175,
+        "rth_ch_module": 0.015,
+        "rth_ha": 0.06,
+        "sic_mos": {
+          "rds_on_25": 20,
+          "rds_on_125": 35,
+          "id_nom": 100,
+          "vds_rated": 1200,
+          "eon_curve": {
+            "vcc": 800,
+            "rg": 5,
+            "tj": 150,
+            "points": [
+              [
+                20,
+                1.0
+              ],
+              [
+                50,
+                2.5
+              ],
+              [
+                100,
+                5.5
+              ]
+            ]
+          },
+          "eoff_curve": {
+            "vcc": 800,
+            "rg": 5,
+            "tj": 150,
+            "points": [
+              [
+                20,
+                0.7
+              ],
+              [
+                50,
+                1.8
+              ],
+              [
+                100,
+                4.0
+              ]
+            ]
+          },
+          "thermal": {
+            "rth_jc": 0.18
+          }
+        },
+        "sic_diode": {
+          "vsd_25": 1.5,
+          "vsd_125": 1.3,
+          "if_nom": 100,
+          "qrr": 0,
+          "thermal": {
+            "rth_jc": 0.28
+          }
+        }
+      }
+    },
+    {
+      "name": "CAB50M12XM3",
+      "manufacturer": "Wolfspeed",
+      "device_type": "sic_module",
+      "vdc_rated": 1200,
+      "ic_rated": 50,
+      "config": {
+        "device_type": "sic_module",
+        "module_name": "CAB50M12XM3",
+        "manufacturer": "Wolfspeed",
+        "vdc_rated": 1200,
+        "ic_rated": 50,
+        "num_parallel_chips": 1,
+        "t_j_max": 175,
+        "rth_ch_module": 0.015,
+        "rth_ha": 0.06,
+        "sic_mos": {
+          "rds_on_25": 35,
+          "rds_on_125": 60,
+          "id_nom": 50,
+          "vds_rated": 1200,
+          "eon_curve": {
+            "vcc": 800,
+            "rg": 5,
+            "tj": 150,
+            "points": [
+              [
+                10,
+                0.5
+              ],
+              [
+                25,
+                1.3
+              ],
+              [
+                50,
+                2.8
+              ]
+            ]
+          },
+          "eoff_curve": {
+            "vcc": 800,
+            "rg": 5,
+            "tj": 150,
+            "points": [
+              [
+                10,
+                0.35
+              ],
+              [
+                25,
+                0.9
+              ],
+              [
+                50,
+                2.0
+              ]
+            ]
+          },
+          "thermal": {
+            "rth_jc": 0.25
+          }
+        },
+        "sic_diode": {
+          "vsd_25": 1.55,
+          "vsd_125": 1.35,
+          "if_nom": 50,
+          "qrr": 0,
+          "thermal": {
+            "rth_jc": 0.38
+          }
+        }
+      }
+    },
+    {
+      "name": "BSM120D12P2C005",
+      "manufacturer": "Rohm",
+      "device_type": "sic_module",
+      "vdc_rated": 1200,
+      "ic_rated": 120,
+      "config": {
+        "device_type": "sic_module",
+        "module_name": "BSM120D12P2C005",
+        "manufacturer": "Rohm",
+        "vdc_rated": 1200,
+        "ic_rated": 120,
+        "num_parallel_chips": 1,
+        "t_j_max": 175,
+        "rth_ch_module": 0.015,
+        "rth_ha": 0.06,
+        "sic_mos": {
+          "rds_on_25": 15,
+          "rds_on_125": 26,
+          "id_nom": 120,
+          "vds_rated": 1200,
+          "eon_curve": {
+            "vcc": 800,
+            "rg": 5,
+            "tj": 150,
+            "points": [
+              [
+                25,
+                0.8
+              ],
+              [
+                60,
+                2.0
+              ],
+              [
+                120,
+                4.5
+              ]
+            ]
+          },
+          "eoff_curve": {
+            "vcc": 800,
+            "rg": 5,
+            "tj": 150,
+            "points": [
+              [
+                25,
+                0.6
+              ],
+              [
+                60,
+                1.5
+              ],
+              [
+                120,
+                3.2
+              ]
+            ]
+          },
+          "thermal": {
+            "rth_jc": 0.16
+          }
+        },
+        "sic_diode": {
+          "vsd_25": 1.45,
+          "vsd_125": 1.25,
+          "if_nom": 120,
+          "qrr": 0,
+          "thermal": {
+            "rth_jc": 0.25
+          }
+        }
+      }
+    },
+    {
+      "name": "MSCSM120AM31CT1AG",
+      "manufacturer": "Microsemi",
+      "device_type": "sic_module",
+      "vdc_rated": 1200,
+      "ic_rated": 120,
+      "config": {
+        "device_type": "sic_module",
+        "module_name": "MSCSM120AM31CT1AG",
+        "manufacturer": "Microsemi",
+        "vdc_rated": 1200,
+        "ic_rated": 120,
+        "num_parallel_chips": 1,
+        "t_j_max": 175,
+        "rth_ch_module": 0.015,
+        "rth_ha": 0.06,
+        "sic_mos": {
+          "rds_on_25": 17,
+          "rds_on_125": 30,
+          "id_nom": 120,
+          "vds_rated": 1200,
+          "eon_curve": {
+            "vcc": 800,
+            "rg": 5,
+            "tj": 150,
+            "points": [
+              [
+                25,
+                0.9
+              ],
+              [
+                60,
+                2.2
+              ],
+              [
+                120,
+                5.0
+              ]
+            ]
+          },
+          "eoff_curve": {
+            "vcc": 800,
+            "rg": 5,
+            "tj": 150,
+            "points": [
+              [
+                25,
+                0.65
+              ],
+              [
+                60,
+                1.6
+              ],
+              [
+                120,
+                3.5
+              ]
+            ]
+          },
+          "thermal": {
+            "rth_jc": 0.17
+          }
+        },
+        "sic_diode": {
+          "vsd_25": 1.5,
+          "vsd_125": 1.3,
+          "if_nom": 120,
+          "qrr": 0,
+          "thermal": {
+            "rth_jc": 0.26
+          }
+        }
+      }
+    },
+    {
+      "name": "FF11MR12W1M1_B11",
+      "manufacturer": "Infineon",
+      "device_type": "sic_module",
+      "vdc_rated": 1200,
+      "ic_rated": 100,
+      "config": {
+        "device_type": "sic_module",
+        "module_name": "FF11MR12W1M1_B11",
+        "manufacturer": "Infineon",
+        "vdc_rated": 1200,
+        "ic_rated": 100,
+        "num_parallel_chips": 1,
+        "t_j_max": 175,
+        "rth_ch_module": 0.015,
+        "rth_ha": 0.06,
+        "sic_mos": {
+          "rds_on_25": 11,
+          "rds_on_125": 18,
+          "id_nom": 100,
+          "vds_rated": 1200,
+          "eon_curve": {
+            "vcc": 800,
+            "rg": 5,
+            "tj": 150,
+            "points": [
+              [
+                20,
+                0.6
+              ],
+              [
+                50,
+                1.5
+              ],
+              [
+                100,
+                3.2
+              ]
+            ]
+          },
+          "eoff_curve": {
+            "vcc": 800,
+            "rg": 5,
+            "tj": 150,
+            "points": [
+              [
+                20,
+                0.4
+              ],
+              [
+                50,
+                1.0
+              ],
+              [
+                100,
+                2.2
+              ]
+            ]
+          },
+          "thermal": {
+            "rth_jc": 0.14
+          }
+        },
+        "sic_diode": {
+          "vsd_25": 1.4,
+          "vsd_125": 1.2,
+          "if_nom": 100,
+          "qrr": 0,
+          "thermal": {
+            "rth_jc": 0.22
+          }
+        }
+      }
+    },
+    {
+      "name": "FF23MR12W1M1_B11",
+      "manufacturer": "Infineon",
+      "device_type": "sic_module",
+      "vdc_rated": 1200,
+      "ic_rated": 75,
+      "config": {
+        "device_type": "sic_module",
+        "module_name": "FF23MR12W1M1_B11",
+        "manufacturer": "Infineon",
+        "vdc_rated": 1200,
+        "ic_rated": 75,
+        "num_parallel_chips": 1,
+        "t_j_max": 175,
+        "rth_ch_module": 0.015,
+        "rth_ha": 0.06,
+        "sic_mos": {
+          "rds_on_25": 23,
+          "rds_on_125": 38,
+          "id_nom": 75,
+          "vds_rated": 1200,
+          "eon_curve": {
+            "vcc": 800,
+            "rg": 5,
+            "tj": 150,
+            "points": [
+              [
+                15,
+                0.7
+              ],
+              [
+                40,
+                1.8
+              ],
+              [
+                75,
+                3.8
+              ]
+            ]
+          },
+          "eoff_curve": {
+            "vcc": 800,
+            "rg": 5,
+            "tj": 150,
+            "points": [
+              [
+                15,
+                0.5
+              ],
+              [
+                40,
+                1.2
+              ],
+              [
+                75,
+                2.5
+              ]
+            ]
+          },
+          "thermal": {
+            "rth_jc": 0.2
+          }
+        },
+        "sic_diode": {
+          "vsd_25": 1.45,
+          "vsd_125": 1.25,
+          "if_nom": 75,
+          "qrr": 0,
+          "thermal": {
+            "rth_jc": 0.3
+          }
+        }
+      }
+    },
+    {
+      "name": "IKW40N65H5",
+      "manufacturer": "Infineon",
+      "device_type": "igbt_discrete",
+      "vdc_rated": 650,
+      "ic_rated": 40,
+      "config": {
+        "device_type": "igbt_discrete",
+        "module_name": "IKW40N65H5",
+        "manufacturer": "Infineon",
+        "vdc_rated": 650,
+        "ic_rated": 40,
+        "num_parallel_chips": 1,
+        "t_j_max": 150,
+        "rth_ch_module": 0.5,
+        "rth_ha": 2.0,
+        "igbt": {
+          "vce_sat_25": 1.5,
+          "vce_sat_125": 1.8,
+          "ic_nom": 40,
+          "vce_rated": 650,
+          "eon_curve": {
+            "vcc": 325,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                8,
+                0.3
+              ],
+              [
+                20,
+                0.8
+              ],
+              [
+                40,
+                1.8
+              ]
+            ]
+          },
+          "eoff_curve": {
+            "vcc": 325,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                8,
+                0.15
+              ],
+              [
+                20,
+                0.45
+              ],
+              [
+                40,
+                1.1
+              ]
+            ]
+          },
+          "thermal": {
+            "rth_jc": 1.0
+          }
+        },
+        "diode": {
+          "vf_25": 1.6,
+          "vf_125": 1.4,
+          "if_nom": 40,
+          "err_curve": {
+            "vcc": 325,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                8,
+                0.12
+              ],
+              [
+                20,
+                0.35
+              ],
+              [
+                40,
+                0.9
+              ]
+            ]
+          },
+          "qrr": 0.36000000000000004,
+          "thermal": {
+            "rth_jc": 1.5
+          }
+        }
+      }
+    },
+    {
+      "name": "IKW75N65H5",
+      "manufacturer": "Infineon",
+      "device_type": "igbt_discrete",
+      "vdc_rated": 650,
+      "ic_rated": 75,
+      "config": {
+        "device_type": "igbt_discrete",
+        "module_name": "IKW75N65H5",
+        "manufacturer": "Infineon",
+        "vdc_rated": 650,
+        "ic_rated": 75,
+        "num_parallel_chips": 1,
+        "t_j_max": 150,
+        "rth_ch_module": 0.5,
+        "rth_ha": 2.0,
+        "igbt": {
+          "vce_sat_25": 1.55,
+          "vce_sat_125": 1.85,
+          "ic_nom": 75,
+          "vce_rated": 650,
+          "eon_curve": {
+            "vcc": 325,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                15,
+                0.6
+              ],
+              [
+                40,
+                1.6
+              ],
+              [
+                75,
+                3.5
+              ]
+            ]
+          },
+          "eoff_curve": {
+            "vcc": 325,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                15,
+                0.35
+              ],
+              [
+                40,
+                0.9
+              ],
+              [
+                75,
+                2.0
+              ]
+            ]
+          },
+          "thermal": {
+            "rth_jc": 0.55
+          }
+        },
+        "diode": {
+          "vf_25": 1.65,
+          "vf_125": 1.45,
+          "if_nom": 75,
+          "err_curve": {
+            "vcc": 325,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                15,
+                0.25
+              ],
+              [
+                40,
+                0.7
+              ],
+              [
+                75,
+                1.6
+              ]
+            ]
+          },
+          "qrr": 0.6400000000000001,
+          "thermal": {
+            "rth_jc": 0.85
+          }
+        }
+      }
+    },
+    {
+      "name": "STGW40M120DF3",
+      "manufacturer": "STMicroelectronics",
+      "device_type": "igbt_discrete",
+      "vdc_rated": 1200,
+      "ic_rated": 40,
+      "config": {
+        "device_type": "igbt_discrete",
+        "module_name": "STGW40M120DF3",
+        "manufacturer": "STMicroelectronics",
+        "vdc_rated": 1200,
+        "ic_rated": 40,
+        "num_parallel_chips": 1,
+        "t_j_max": 150,
+        "rth_ch_module": 0.5,
+        "rth_ha": 2.0,
+        "igbt": {
+          "vce_sat_25": 1.8,
+          "vce_sat_125": 2.2,
+          "ic_nom": 40,
+          "vce_rated": 1200,
+          "eon_curve": {
+            "vcc": 600,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                8,
+                0.6
+              ],
+              [
+                20,
+                1.5
+              ],
+              [
+                40,
+                3.5
+              ]
+            ]
+          },
+          "eoff_curve": {
+            "vcc": 600,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                8,
+                0.35
+              ],
+              [
+                20,
+                0.9
+              ],
+              [
+                40,
+                2.2
+              ]
+            ]
+          },
+          "thermal": {
+            "rth_jc": 1.2
+          }
+        },
+        "diode": {
+          "vf_25": 1.9,
+          "vf_125": 1.65,
+          "if_nom": 40,
+          "err_curve": {
+            "vcc": 600,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                8,
+                0.25
+              ],
+              [
+                20,
+                0.65
+              ],
+              [
+                40,
+                1.5
+              ]
+            ]
+          },
+          "qrr": 0.6000000000000001,
+          "thermal": {
+            "rth_jc": 1.8
+          }
+        }
+      }
+    },
+    {
+      "name": "NGTB40N120FL2WG",
+      "manufacturer": "ON Semiconductor",
+      "device_type": "igbt_discrete",
+      "vdc_rated": 1200,
+      "ic_rated": 40,
+      "config": {
+        "device_type": "igbt_discrete",
+        "module_name": "NGTB40N120FL2WG",
+        "manufacturer": "ON Semiconductor",
+        "vdc_rated": 1200,
+        "ic_rated": 40,
+        "num_parallel_chips": 1,
+        "t_j_max": 150,
+        "rth_ch_module": 0.5,
+        "rth_ha": 2.0,
+        "igbt": {
+          "vce_sat_25": 1.75,
+          "vce_sat_125": 2.1,
+          "ic_nom": 40,
+          "vce_rated": 1200,
+          "eon_curve": {
+            "vcc": 600,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                8,
+                0.55
+              ],
+              [
+                20,
+                1.4
+              ],
+              [
+                40,
+                3.2
+              ]
+            ]
+          },
+          "eoff_curve": {
+            "vcc": 600,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                8,
+                0.3
+              ],
+              [
+                20,
+                0.85
+              ],
+              [
+                40,
+                2.0
+              ]
+            ]
+          },
+          "thermal": {
+            "rth_jc": 1.1
+          }
+        },
+        "diode": {
+          "vf_25": 1.85,
+          "vf_125": 1.6,
+          "if_nom": 40,
+          "err_curve": {
+            "vcc": 600,
+            "rg": 10,
+            "tj": 125,
+            "points": [
+              [
+                8,
+                0.22
+              ],
+              [
+                20,
+                0.6
+              ],
+              [
+                40,
+                1.4
+              ]
+            ]
+          },
+          "qrr": 0.5599999999999999,
+          "thermal": {
+            "rth_jc": 1.6
+          }
+        }
+      }
+    }
+  ]
+}

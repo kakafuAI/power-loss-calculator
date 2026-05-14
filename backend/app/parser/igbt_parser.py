@@ -32,6 +32,15 @@ class IGBTExtractedParams:
         self.eoff_rg_ref: Optional[float] = None
         self.rth_jc_igbt: Optional[float] = None
         self.rth_jc_diode: Optional[float] = None
+        # v1.2.0新增
+        self.rg_int: Optional[float] = None
+        self.t_j_max: Optional[float] = None
+        self.ton: Optional[float] = None
+        self.toff: Optional[float] = None
+        self.cies: Optional[float] = None
+        self.eon_points: list = []
+        self.eoff_points: list = []
+        self.err_points: list = []
         self.rth_cs: Optional[float] = None
         self.confidence: dict = {}
 
@@ -165,6 +174,59 @@ def extract_igbt_params(result: PDFExtractResult) -> IGBTExtractedParams:
     if params.qrr:
         params.confidence["qrr"] = 0.7
 
+    # ── v1.2.0 新增提取 ──────────────────────────────────────────────
+    from .patterns import (
+        RG_INT_PATTERNS, TJ_MAX_PATTERNS, TON_PATTERN, TOFF_PATTERN,
+        TR_PATTERN, TF_PATTERN, CIES_PATTERN, COES_PATTERN, CRES_PATTERN,
+        QG_PATTERN, RTH_CS_GREASE, extract_table_rows,
+    )
+
+    for pat in RG_INT_PATTERNS:
+        v = extract_float(text, pat)
+        if v is not None and 0.1 < v < 100:
+            params.rg_int = v
+            params.confidence["rg_int"] = 0.7
+            break
+
+    for pat in TJ_MAX_PATTERNS:
+        v = extract_float(text, pat)
+        if v is not None and 100 < v < 250:
+            params.t_j_max = v
+            params.confidence["t_j_max"] = 0.8
+            break
+
+    # Switching times
+    ton = extract_float(sw_text, TON_PATTERN)
+    if ton: params.confidence["ton"] = 0.6
+    toff = extract_float(sw_text, TOFF_PATTERN)
+    if toff: params.confidence["toff"] = 0.6
+
+    # Capacitances
+    cies = extract_float(text, CIES_PATTERN)
+    if cies: params.confidence["cies"] = 0.6
+
+    # Multi-point switching energy curve from tables
+    eon_pts = extract_table_rows(sw_text, "Eon")
+    if len(eon_pts) >= 2:
+        params.eon_points = eon_pts
+        params.confidence["eon_points"] = 0.8
+
+    eoff_pts = extract_table_rows(sw_text, "Eoff")
+    if len(eoff_pts) >= 2:
+        params.eoff_points = eoff_pts
+        params.confidence["eoff_points"] = 0.8
+
+    err_pts = extract_table_rows(sw_text, "Err")
+    if len(err_pts) >= 2:
+        params.err_points = err_pts
+        params.confidence["err_points"] = 0.8
+
+    # Rth(c-s) with grease
+    rth_cs_g = extract_float(text, RTH_CS_GREASE)
+    if rth_cs_g:
+        params.rth_cs = rth_cs_g
+        params.confidence["rth_cs"] = 0.7
+
     # ── Thermal resistances ───────────────────────────────────────────
     thermal_section = result.get_section("thermal", 20)
     th_text = thermal_section if thermal_section else text
@@ -216,5 +278,14 @@ def params_to_dict(params: IGBTExtractedParams) -> dict:
         "rth_jc_igbt": params.rth_jc_igbt,
         "rth_jc_diode": params.rth_jc_diode,
         "rth_cs": params.rth_cs,
+        # v1.2.0新增
+        "rg_int": params.rg_int,
+        "t_j_max": params.t_j_max,
+        "ton": params.ton,
+        "toff": params.toff,
+        "cies": params.cies,
+        "eon_points": params.eon_points,
+        "eoff_points": params.eoff_points,
+        "err_points": params.err_points,
         "confidence": params.confidence,
     }
