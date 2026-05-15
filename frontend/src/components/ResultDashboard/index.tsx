@@ -1,13 +1,15 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   Card, Row, Col, Statistic, Table, Tabs, Typography, Button,
   Space, Divider, Tag, Collapse, Descriptions, message, Tooltip,
+  Alert, List,
 } from 'antd';
 import {
   ThunderboltOutlined, DownloadOutlined, ReloadOutlined,
   CheckCircleOutlined, CloseCircleOutlined, InfoCircleOutlined,
-  EditOutlined, PlusOutlined,
+  EditOutlined, PlusOutlined, WarningOutlined, CheckOutlined,
 } from '@ant-design/icons';
+import axios from 'axios';
 import ReactECharts from 'echarts-for-react';
 import LossPieChart from '../charts/LossPieChart';
 import WaveformChart from '../charts/WaveformChart';
@@ -212,6 +214,9 @@ export default function ResultDashboard({
         </Col>
       </Row>
 
+      {/* Selection Assistance */}
+      <SelectionAdvice result={result} config={config} conditions={conditions} />
+
       {/* Main tabs */}
       <Tabs
         defaultActiveKey="overview"
@@ -398,5 +403,159 @@ export default function ResultDashboard({
         ]}
       />
     </div>
+  );
+}
+
+// Selection advice sub-component
+function SelectionAdvice({ result, config }: {
+  result: CalculationResult;
+  config: ModuleConfig;
+  conditions: OperatingConditions;
+}) {
+  const [similarDevices, setSimilarDevices] = useState<any[]>([]);
+
+  useEffect(() => {
+    axios.get(`/api/devices?limit=10&device_type=${config.device_type}`).then(({ data }) => {
+      setSimilarDevices((data.devices || []).slice(0, 5));
+    }).catch(() => {});
+  }, [config.device_type]);
+
+  const tJMargin = config.t_j_max - result.t_j_max;
+  const tJOk = tJMargin > 20;
+  const tJWarn = tJMargin > 0 && tJMargin <= 20;
+  const tJFail = tJMargin <= 0;
+
+  const lossBreakdown = result.p_total_loss > 0 ? {
+    igbtCondPct: (result.p_igbt_cond / result.p_total_loss * 100).toFixed(0),
+    igbtSwPct: (result.p_igbt_sw / result.p_total_loss * 100).toFixed(0),
+    diodeCondPct: (result.p_diode_cond / result.p_total_loss * 100).toFixed(0),
+    diodeSwPct: (result.p_diode_sw / result.p_total_loss * 100).toFixed(0),
+  } : null;
+
+  return (
+    <Collapse
+      style={{ marginTop: 16, marginBottom: 16 }}
+      items={[{
+        key: 'advice',
+        label: <Text strong>💡 选型分析建议</Text>,
+        children: (
+          <div>
+            {/* Thermal assessment */}
+            <Alert
+              type={tJOk ? 'success' : tJWarn ? 'warning' : 'error'}
+              message={
+                tJOk ? '结温余量充足' :
+                tJWarn ? '结温余量偏紧' :
+                '结温超标！器件可能过热'
+              }
+              description={
+                <div>
+                  <Text>Tj_max = {result.t_j_max.toFixed(1)}°C, 器件额定 Tj_max = {config.t_j_max}°C, 余量 = {tJMargin.toFixed(1)}°C</Text>
+                  {tJWarn && <Text type="warning" style={{ display: 'block' }}>建议考虑更大电流规格或改善散热条件</Text>}
+                  {tJFail && <Text type="danger" style={{ display: 'block' }}>必须更换更高规格器件或降低工况要求</Text>}
+                </div>
+              }
+              style={{ marginBottom: 12 }}
+            />
+
+            {/* Loss breakdown analysis */}
+            {lossBreakdown && (
+              <Row gutter={12} style={{ marginBottom: 12 }}>
+                <Col span={6}>
+                  <Card size="small" style={{ background: '#f0f5ff' }}>
+                    <Text type="secondary" style={{ fontSize: 11 }}>IGBT 导通</Text>
+                    <div><Text strong style={{ fontSize: 16 }}>{lossBreakdown.igbtCondPct}%</Text></div>
+                    <Text style={{ fontSize: 10 }}>{parseInt(lossBreakdown.igbtCondPct) > 40 ? '主导损耗，可降频改善' : '正常范围'}</Text>
+                  </Card>
+                </Col>
+                <Col span={6}>
+                  <Card size="small" style={{ background: '#fff7e6' }}>
+                    <Text type="secondary" style={{ fontSize: 11 }}>IGBT 开关</Text>
+                    <div><Text strong style={{ fontSize: 16 }}>{lossBreakdown.igbtSwPct}%</Text></div>
+                    <Text style={{ fontSize: 10 }}>{parseInt(lossBreakdown.igbtSwPct) > 40 ? '开关损耗突出，考虑降频或 SiC' : '正常范围'}</Text>
+                  </Card>
+                </Col>
+                <Col span={6}>
+                  <Card size="small" style={{ background: '#f6ffed' }}>
+                    <Text type="secondary" style={{ fontSize: 11 }}>二极管 导通</Text>
+                    <div><Text strong style={{ fontSize: 16 }}>{lossBreakdown.diodeCondPct}%</Text></div>
+                    <Text style={{ fontSize: 10 }}>{parseInt(lossBreakdown.diodeCondPct) > 30 ? '续流损耗偏高' : '正常范围'}</Text>
+                  </Card>
+                </Col>
+                <Col span={6}>
+                  <Card size="small" style={{ background: '#fff0f6' }}>
+                    <Text type="secondary" style={{ fontSize: 11 }}>二极管 开关</Text>
+                    <div><Text strong style={{ fontSize: 16 }}>{lossBreakdown.diodeSwPct}%</Text></div>
+                    <Text style={{ fontSize: 10 }}>{parseInt(lossBreakdown.diodeSwPct) > 15 ? '反向恢复明显' : '正常范围'}</Text>
+                  </Card>
+                </Col>
+              </Row>
+            )}
+
+            {/* Efficiency */}
+            <Row gutter={12} style={{ marginBottom: 12 }}>
+              <Col span={12}>
+                <Card size="small" style={{ background: result.efficiency > 97 ? '#f6ffed' : result.efficiency > 93 ? '#fffbe6' : '#fff2f0' }}>
+                  <Text strong>系统效率评估</Text>
+                  <div style={{ marginTop: 4 }}>
+                    <Text>当前效率 {result.efficiency.toFixed(2)}% — </Text>
+                    {result.efficiency > 97 ? (
+                      <Text type="success">高效工作区，散热系统裕量充足</Text>
+                    ) : result.efficiency > 93 ? (
+                      <Text type="warning">中等效率，关注散热设计</Text>
+                    ) : (
+                      <Text type="danger">效率偏低，建议检查工况匹配度</Text>
+                    )}
+                  </div>
+                </Card>
+              </Col>
+              <Col span={12}>
+                <Card size="small" style={{ background: '#f0f5ff' }}>
+                  <Text strong>选型方向建议</Text>
+                  <div style={{ marginTop: 4 }}>
+                    {parseInt(lossBreakdown?.igbtSwPct || '0') > 35 ? (
+                      <Text>开关损耗占比较高 → 考虑<Text strong>SiC MOSFET</Text>替代，降低开关损耗</Text>
+                    ) : parseInt(lossBreakdown?.igbtCondPct || '0') > 40 ? (
+                      <Text>导通损耗占比较高 → 考虑<Text strong>更低 Vce(sat)</Text>的器件或并联方案</Text>
+                    ) : (
+                      <Text>损耗分布均衡 → 当前器件选型基本合理</Text>
+                    )}
+                  </div>
+                </Card>
+              </Col>
+            </Row>
+
+            {/* Similar devices */}
+            {similarDevices.length > 0 && (
+              <Card size="small" title="器件库中同类型器件参考" style={{ marginBottom: 0 }}>
+                <List
+                  size="small"
+                  dataSource={similarDevices}
+                  renderItem={(dev: any) => {
+                    let devConfig: any = {};
+                    try { devConfig = JSON.parse(dev.config_json); } catch {}
+                    return (
+                      <List.Item>
+                        <Space>
+                          <Text strong>{dev.device_name}</Text>
+                          <Text type="secondary">{dev.manufacturer}</Text>
+                          <Tag>{dev.device_type}</Tag>
+                          <Text type="secondary">
+                            {devConfig.vdc_rated || '?'}V / {devConfig.ic_rated || '?'}A
+                          </Text>
+                          <Text type="secondary">
+                            Vce(sat): {devConfig.igbt?.vce_sat_25 || devConfig.sic_mos?.rds_on_25 || '?'}
+                          </Text>
+                        </Space>
+                      </List.Item>
+                    );
+                  }}
+                />
+              </Card>
+            )}
+          </div>
+        ),
+      }]}
+    />
   );
 }

@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Table, Typography, Tag, Rate, Button, Space, message, Popconfirm } from 'antd';
-import { EyeOutlined, ThunderboltOutlined } from '@ant-design/icons';
+import { EyeOutlined, ThunderboltOutlined, SwapOutlined } from '@ant-design/icons';
 import type { ModuleConfig, OperatingConditions } from '../types';
 import axios from 'axios';
 
@@ -15,6 +15,7 @@ export default function CalculationHistory({ onSelect }: Props) {
   const [records, setRecords] = useState<any[]>([]);
   const [loading, setLoading] = useState(false);
   const [anomalies, setAnomalies] = useState<any[]>([]);
+  const [selectedRowKeys, setSelectedRowKeys] = useState<number[]>([]);
 
   const fetchHistory = async () => {
     setLoading(true);
@@ -39,11 +40,26 @@ export default function CalculationHistory({ onSelect }: Props) {
 
   const handleReuse = (record: any) => {
     try {
-      const conditions = JSON.parse(record.conditions_json);
-      const result = JSON.parse(record.result_json);
-      // Navigate to calculate and pre-fill — simplified for now
-      message.info(`已加载历史记录: ${record.device_name}`);
+      const config = JSON.parse(record.config_json || '{}');
+      if (!config.device_type) {
+        message.error('该记录缺少配置信息，无法复用');
+        return;
+      }
+      onSelect(config);
+      message.success(`已加载历史记录: ${record.device_name || config.module_name || '未知'}`);
     } catch { message.error('记录解析失败'); }
+  };
+
+  const handleCompare = async () => {
+    if (selectedRowKeys.length < 2) {
+      message.warning('请至少选择2条记录进行对比');
+      return;
+    }
+    try {
+      await axios.post('/api/compare', { calc_ids: selectedRowKeys });
+      message.success('对比已创建，请在"对比分析"页面查看');
+      setSelectedRowKeys([]);
+    } catch { message.error('对比创建失败'); }
   };
 
   const columns = [
@@ -56,7 +72,10 @@ export default function CalculationHistory({ onSelect }: Props) {
     },
     {
       title: '效率', dataIndex: 'efficiency', width: 80,
-      render: (v: number) => <Tag color={v > 95 ? 'green' : v > 85 ? 'orange' : 'red'}>{v?.toFixed(1)}%</Tag>,
+      render: (v: number) => {
+        const pct = (v ?? 0) * 100;
+        return <Tag color={pct > 95 ? 'green' : pct > 85 ? 'orange' : 'red'}>{pct.toFixed(1)}%</Tag>;
+      },
     },
     {
       title: 'Tj_max', dataIndex: 't_j_max', width: 80,
@@ -71,6 +90,13 @@ export default function CalculationHistory({ onSelect }: Props) {
       render: (v: number, record: any) => (
         <Rate count={5} value={v || 0} style={{ fontSize: 14 }}
           onChange={(s) => handleTrustChange(record.id, s)} />
+      ),
+    },
+    {
+      title: '操作', width: 80,
+      render: (_: unknown, record: any) => (
+        <Button type="link" size="small" icon={<EyeOutlined />}
+          onClick={() => handleReuse(record)}>复用</Button>
       ),
     },
   ];
@@ -98,8 +124,20 @@ export default function CalculationHistory({ onSelect }: Props) {
         </div>
       )}
 
+      <Space style={{ marginBottom: 16 }}>
+        <Button icon={<SwapOutlined />} disabled={selectedRowKeys.length < 2}
+          onClick={handleCompare}>
+          对比选中 ({selectedRowKeys.length})
+        </Button>
+        <Text type="secondary">勾选 2 条以上记录后可创建对比分析</Text>
+      </Space>
+
       <Table dataSource={records.map((r: any) => ({ ...r, key: r.id }))}
         columns={columns} loading={loading} size="small"
+        rowSelection={{
+          selectedRowKeys,
+          onChange: (keys) => setSelectedRowKeys(keys as number[]),
+        }}
         pagination={{ pageSize: 20 }}
         expandable={{
           expandedRowRender: (record: any) => {

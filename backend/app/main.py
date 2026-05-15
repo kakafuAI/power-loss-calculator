@@ -1,7 +1,22 @@
 """FastAPI application entry point for power loss calculator."""
 
-from fastapi import FastAPI
+import os
+from pathlib import Path
+
+# Load .env file before other imports
+_env_path = Path(__file__).resolve().parent.parent / ".env"
+if _env_path.exists():
+    with open(_env_path) as _f:
+        for _line in _f:
+            _line = _line.strip()
+            if _line and not _line.startswith("#") and "=" in _line:
+                _key, _val = _line.split("=", 1)
+                os.environ.setdefault(_key.strip(), _val.strip())
+
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import FileResponse
+from pathlib import Path
 
 from .routers import calculation, datasheet, export, devices, history, comparison
 from .database.connection import init_db
@@ -47,3 +62,25 @@ async def startup():
 @app.get("/api/health")
 async def health_check():
     return {"status": "ok", "version": "1.2.0"}
+
+
+# ──────────────────────────────────────────
+# Serve built frontend (production deployment)
+# ──────────────────────────────────────────
+# This MUST be mounted AFTER API routes so /api/* takes priority
+FRONTEND_DIST = Path(__file__).resolve().parent.parent.parent / "frontend" / "dist"
+if FRONTEND_DIST.exists():
+    from fastapi.staticfiles import StaticFiles
+
+    class SPARouter(StaticFiles):
+        """SPA fallback: for non-existing files, serve index.html."""
+        async def get_response(self, path: str, scope):
+            try:
+                return await super().get_response(path, scope)
+            except (HTTPException, Exception):
+                return FileResponse(str(FRONTEND_DIST / "index.html"))
+
+    app.mount("/", SPARouter(directory=str(FRONTEND_DIST), html=True), name="frontend")
+    print(f"✅ 前端静态文件已加载: {FRONTEND_DIST}")
+else:
+    print(f"⚠️  前端构建产物不存在 ({FRONTEND_DIST})，请先执行: cd frontend && npm run build")

@@ -2,15 +2,14 @@ import { useState } from 'react';
 import { Card, Row, Col, Typography, Space, Tag, Slider, Select } from 'antd';
 import {
   ThunderboltOutlined, SwapOutlined, DashboardOutlined,
-  ExperimentOutlined, AlertOutlined, HeatMapOutlined, ReloadOutlined,
+  ExperimentOutlined, HeatMapOutlined, SoundOutlined,
 } from '@ant-design/icons';
 import ModulationDiagram from './ModulationDiagram';
 import PowerFactorDiagram from './PowerFactorDiagram';
 import ConductionLossDiagram from './ConductionLossDiagram';
 import SwitchingLossDiagram from './SwitchingLossDiagram';
-import DiodeFreewheelDiagram from './DiodeFreewheelDiagram';
 import ThermalNetworkDiagram from './ThermalNetworkDiagram';
-import ThermalIterationDiagram from './ThermalIterationDiagram';
+import THDiDiagram from './THDiDiagram';
 
 const { Title, Paragraph } = Typography;
 
@@ -21,11 +20,10 @@ interface Props {
 const concepts = [
   { key: 'modulation', label: '调制比 & 调制方式', icon: <DashboardOutlined />, component: ModulationDiagram },
   { key: 'power_factor', label: '功率因数', icon: <SwapOutlined />, component: PowerFactorDiagram },
-  { key: 'conduction', label: '导通损耗机制', icon: <ThunderboltOutlined />, component: ConductionLossDiagram },
+  { key: 'conduction', label: '导通 & 续流机制', icon: <ThunderboltOutlined />, component: ConductionLossDiagram },
   { key: 'switching', label: '开关损耗机制', icon: <ExperimentOutlined />, component: SwitchingLossDiagram },
-  { key: 'freewheel', label: '二极管续流', icon: <ReloadOutlined />, component: DiodeFreewheelDiagram },
-  { key: 'thermal_network', label: '热阻网络', icon: <HeatMapOutlined />, component: ThermalNetworkDiagram },
-  { key: 'thermal_iter', label: '热迭代过程', icon: <AlertOutlined />, component: ThermalIterationDiagram },
+  { key: 'thermal_network', label: '热阻网络 & 迭代求解', icon: <HeatMapOutlined />, component: ThermalNetworkDiagram },
+  { key: 'thdi', label: 'THDi 谐波影响', icon: <SoundOutlined />, component: THDiDiagram },
 ];
 
 export default function ConceptExplorer({ conditions }: Props) {

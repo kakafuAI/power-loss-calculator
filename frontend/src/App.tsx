@@ -16,8 +16,12 @@ import ConceptExplorer from './components/concepts/ConceptExplorer';
 import DeviceLibrary from './pages/DeviceLibrary';
 import CalculationHistory from './pages/CalculationHistory';
 import ComparisonView from './pages/ComparisonView';
+import ConceptDemoCompare from './pages/ConceptDemoCompare';
+import ConductionLossCompare from './pages/ConductionLossCompare';
+import ThermalNetworkCompare from './pages/ThermalNetworkCompare';
 import type { ModuleConfig, OperatingConditions, CalculationResult, DeviceType } from './types';
-import { calculateLossesCombined } from './api/client';
+import { calculateLossesCombined, saveHistory } from './api/client';
+import { message } from 'antd';
 
 const { Header, Content, Sider } = Layout;
 const { Title } = Typography;
@@ -44,7 +48,7 @@ const defaultConditions: OperatingConditions = {
   modulation_index: 1.0, power_factor: 0.85, modulation: 'spwm', t_ambient: 40,
 };
 
-type PageKey = 'calculate' | 'devices' | 'concepts' | 'history' | 'compare';
+type PageKey = 'calculate' | 'devices' | 'concepts' | 'history' | 'compare' | 'demo' | 'cond_demo' | 'therm_demo';
 
 export default function App() {
   const [currentStep, setCurrentStep] = useState(0);
@@ -58,19 +62,62 @@ export default function App() {
   const handleDeviceTypeChange = useCallback((type: DeviceType) => {
     setConfig(prev => {
       const next = { ...prev, device_type: type };
-      if (type === 'sic_module' || type === 'sic_discrete') {
+      if (type === 'sic_module') {
         next.sic_mos = {
           rds_on_25: 20, rds_on_125: 35, id_nom: 100, vds_rated: 1200,
-          eon_curve: { vcc: 800, rg: 5, tj: 150, points: [{ current: 100, energy: 2 }] },
-          eoff_curve: { vcc: 800, rg: 5, tj: 150, points: [{ current: 100, energy: 1.5 }] },
+          eon_curve: { vcc: 800, rg: 5, tj: 150, points: [{ current: 100, energy: 1.8 }] },
+          eoff_curve: { vcc: 800, rg: 5, tj: 150, points: [{ current: 100, energy: 1.2 }] },
           thermal: { rth_jc: 0.2 },
         };
         next.sic_diode = {
-          vsd_25: 1.5, vsd_125: 1.3, if_nom: 100, qrr: 0, thermal: { rth_jc: 0.3 },
+          vsd_25: 1.35, vsd_125: 1.2, if_nom: 100, qrr: 0, thermal: { rth_jc: 0.3 },
         };
         next.igbt = undefined; next.diode = undefined;
-      } else {
+        next.vdc_rated = 1200; next.ic_rated = 100; next.t_j_max = 175;
+      } else if (type === 'sic_discrete') {
+        next.sic_mos = {
+          rds_on_25: 40, rds_on_125: 65, id_nom: 50, vds_rated: 1200,
+          eon_curve: { vcc: 800, rg: 5, tj: 150, points: [{ current: 50, energy: 0.9 }] },
+          eoff_curve: { vcc: 800, rg: 5, tj: 150, points: [{ current: 50, energy: 0.6 }] },
+          thermal: { rth_jc: 0.6 },
+        };
+        next.sic_diode = {
+          vsd_25: 1.35, vsd_125: 1.2, if_nom: 50, qrr: 0, thermal: { rth_jc: 0.8 },
+        };
+        next.igbt = undefined; next.diode = undefined;
+        next.vdc_rated = 1200; next.ic_rated = 50; next.t_j_max = 175;
+      } else if (type === 'ipm_module') {
+        next.igbt = {
+          vce_sat_25: 1.5, vce_sat_125: 1.8, ic_nom: 50, vce_rated: 600,
+          eon_curve: { vcc: 300, rg: 10, tj: 125, points: [{ current: 50, energy: 3.5 }] },
+          eoff_curve: { vcc: 300, rg: 10, tj: 125, points: [{ current: 50, energy: 2.5 }] },
+          thermal: { rth_jc: 1.2 },
+        };
+        next.diode = {
+          vf_25: 1.5, vf_125: 1.3, if_nom: 50,
+          err_curve: { vcc: 300, rg: 10, tj: 125, points: [{ current: 50, energy: 1.5 }] },
+          qrr: 3, thermal: { rth_jc: 1.8 },
+        };
         next.sic_mos = undefined; next.sic_diode = undefined;
+        next.vdc_rated = 600; next.ic_rated = 50; next.t_j_max = 150;
+      } else if (type === 'igbt_discrete') {
+        next.igbt = {
+          vce_sat_25: 1.45, vce_sat_125: 1.8, ic_nom: 40, vce_rated: 600,
+          eon_curve: { vcc: 300, rg: 10, tj: 125, points: [{ current: 40, energy: 0.5 }] },
+          eoff_curve: { vcc: 300, rg: 10, tj: 125, points: [{ current: 40, energy: 0.3 }] },
+          thermal: { rth_jc: 1.5 },
+        };
+        next.diode = {
+          vf_25: 1.4, vf_125: 1.2, if_nom: 40,
+          err_curve: { vcc: 300, rg: 10, tj: 125, points: [{ current: 40, energy: 0.2 }] },
+          qrr: 2, thermal: { rth_jc: 2.5 },
+        };
+        next.sic_mos = undefined; next.sic_diode = undefined;
+        next.vdc_rated = 600; next.ic_rated = 40; next.t_j_max = 175;
+      } else {
+        // igbt_module default
+        next.sic_mos = undefined; next.sic_diode = undefined;
+        next.vdc_rated = 1200; next.ic_rated = 100; next.t_j_max = 150;
       }
       return next;
     });
@@ -82,14 +129,78 @@ export default function App() {
       const res = await calculateLossesCombined(config, conditions);
       setResult(res);
       setCurrentStep(3);
-    } catch (err) { console.error('Calculation failed:', err); }
+      saveHistory({ config, conditions, result: res }).catch(() => {});
+    } catch (err: any) {
+      const detail = err?.response?.data?.detail || err?.message || '未知错误';
+      message.error(`计算失败: ${detail}`);
+      console.error('Calculation failed:', err);
+    }
     finally { setLoading(false); }
   }, [config, conditions]);
 
   const handleSelectDevice = useCallback((devConfig: ModuleConfig) => {
-    setConfig(devConfig);
+    // Ensure all required fields have defaults
+    const filled: ModuleConfig = {
+      ...devConfig,
+      device_type: devConfig.device_type || 'igbt_module',
+      module_name: devConfig.module_name || '',
+      manufacturer: devConfig.manufacturer || '',
+      vdc_rated: devConfig.vdc_rated || 1200,
+      ic_rated: devConfig.ic_rated || 100,
+      num_parallel_chips: devConfig.num_parallel_chips || 1,
+      t_j_max: devConfig.t_j_max || 150,
+      rth_ch_module: devConfig.rth_ch_module ?? 0.02,
+      rth_ha: devConfig.rth_ha ?? 0.08,
+    };
+    // Ensure sub-objects have required nested fields
+    if (filled.igbt) {
+      filled.igbt = {
+        vce_sat_25: filled.igbt.vce_sat_25 ?? 1.7,
+        vce_sat_125: filled.igbt.vce_sat_125 ?? 2.0,
+        ic_nom: filled.igbt.ic_nom ?? 100,
+        vce_rated: filled.igbt.vce_rated ?? 1200,
+        eon_curve: { vcc: 600, rg: 10, tj: 125, points: filled.igbt.eon_curve?.points?.length ? filled.igbt.eon_curve.points : [{ current: 100, energy: 15 }] },
+        eoff_curve: { vcc: 600, rg: 10, tj: 125, points: filled.igbt.eoff_curve?.points?.length ? filled.igbt.eoff_curve.points : [{ current: 100, energy: 10 }] },
+        thermal: { rth_jc: filled.igbt.thermal?.rth_jc ?? 0.24 },
+        rg_int: filled.igbt.rg_int,
+      };
+    }
+    if (filled.diode) {
+      filled.diode = {
+        vf_25: filled.diode.vf_25 ?? 1.8,
+        vf_125: filled.diode.vf_125 ?? 1.6,
+        if_nom: filled.diode.if_nom ?? 100,
+        err_curve: { vcc: 600, rg: 10, tj: 125, points: filled.diode.err_curve?.points?.length ? filled.diode.err_curve.points : [{ current: 100, energy: 8 }] },
+        qrr: filled.diode.qrr ?? 5,
+        thermal: { rth_jc: filled.diode.thermal?.rth_jc ?? 0.42 },
+      };
+    }
+    if (filled.sic_mos) {
+      filled.sic_mos = {
+        rds_on_25: filled.sic_mos.rds_on_25 ?? 20,
+        rds_on_125: filled.sic_mos.rds_on_125 ?? 35,
+        id_nom: filled.sic_mos.id_nom ?? 100,
+        vds_rated: filled.sic_mos.vds_rated ?? 1200,
+        eon_curve: { vcc: 800, rg: 5, tj: 150, points: filled.sic_mos.eon_curve?.points?.length ? filled.sic_mos.eon_curve.points : [{ current: 100, energy: 2 }] },
+        eoff_curve: { vcc: 800, rg: 5, tj: 150, points: filled.sic_mos.eoff_curve?.points?.length ? filled.sic_mos.eoff_curve.points : [{ current: 100, energy: 1.5 }] },
+        thermal: { rth_jc: filled.sic_mos.thermal?.rth_jc ?? 0.2 },
+        rg_int: filled.sic_mos.rg_int,
+      };
+    }
+    if (filled.sic_diode) {
+      filled.sic_diode = {
+        vsd_25: filled.sic_diode.vsd_25 ?? 1.5,
+        vsd_125: filled.sic_diode.vsd_125 ?? 1.3,
+        if_nom: filled.sic_diode.if_nom ?? 100,
+        qrr: filled.sic_diode.qrr ?? 0,
+        thermal: { rth_jc: filled.sic_diode.thermal?.rth_jc ?? 0.3 },
+      };
+    }
+    setConfig(filled);
+    setResult(null);
     setCurrentPage('calculate');
     setCurrentStep(2);
+    message.success(`已加载器件: ${filled.module_name || filled.manufacturer || '未知器件'}`);
   }, []);
 
   const menuItems = [
@@ -98,6 +209,9 @@ export default function App() {
     { key: 'concepts' as PageKey, icon: <ExperimentOutlined />, label: '概念图解' },
     { key: 'history' as PageKey, icon: <HistoryOutlined />, label: '计算历史' },
     { key: 'compare' as PageKey, icon: <BarChartOutlined />, label: '对比分析' },
+    { key: 'demo' as PageKey, icon: <ExperimentOutlined />, label: '方案对比-PF' },
+    { key: 'cond_demo' as PageKey, icon: <ExperimentOutlined />, label: '方案对比-导通' },
+    { key: 'therm_demo' as PageKey, icon: <ExperimentOutlined />, label: '方案对比-热阻' },
   ];
 
   const renderCalculator = () => (
@@ -128,7 +242,10 @@ export default function App() {
       case 'devices': return <DeviceLibrary onSelect={handleSelectDevice} conditions={conditions} />;
       case 'concepts': return <ConceptExplorer conditions={conditions} />;
       case 'history': return <CalculationHistory onSelect={handleSelectDevice} conditions={conditions} />;
-      case 'compare': return <ComparisonView />;
+      case 'compare': return <ComparisonView result={result} config={config} conditions={conditions} />;
+      case 'demo': return <ConceptDemoCompare />;
+      case 'cond_demo': return <ConductionLossCompare />;
+      case 'therm_demo': return <ThermalNetworkCompare />;
       default: return renderCalculator();
     }
   };

@@ -68,3 +68,42 @@ export async function exportCSV(resultData: Record<string, unknown>): Promise<Bl
   });
   return data;
 }
+
+export async function saveHistory(params: {
+  config: ModuleConfig;
+  conditions: OperatingConditions;
+  result: CalculationResult;
+  rating?: number;
+}): Promise<{ id: number }> {
+  const { data } = await api.post('/history', {
+    device_name: params.config.module_name || params.config.manufacturer || '',
+    device_type: params.config.device_type,
+    config: params.config,
+    conditions: params.conditions,
+    result: params.result,
+    t_j_max: params.result.t_j_max ?? 0,
+    p_total_loss: params.result.p_total_loss ?? 0,
+    efficiency: params.result.efficiency ?? 0,
+    converged: params.result.converged ?? true,
+    trust_score: params.rating,
+  });
+  return data;
+}
+
+export async function fetchHistory(params?: {
+  limit?: number;
+  device_type?: string;
+}): Promise<any[]> {
+  const { data } = await api.get('/history', { params });
+  return data;
+}
+
+export async function createComparison(calcIds: number[]): Promise<any> {
+  const { data } = await api.post('/compare', { calc_ids: calcIds });
+  return data;
+}
+
+export async function fetchComparisons(limit: number = 20): Promise<any[]> {
+  const { data } = await api.get('/compare', { params: { limit } });
+  return data;
+}

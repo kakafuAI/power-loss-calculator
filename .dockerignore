@@ -1,0 +1,14 @@
+node_modules/
+__pycache__/
+*.pyc
+.env
+venv/
+backend/venv/
+spikes/
+*.db
+*.log
+deploy.log
+.deploy.pid
+*.png
+*.excalidraw
+.cache/

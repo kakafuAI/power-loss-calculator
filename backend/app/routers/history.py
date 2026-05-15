@@ -37,6 +37,8 @@ async def save_calculation(data: dict):
     calc_id = db.save_calculation(
         device_id=data.get("device_id"),
         device_name=data.get("device_name", ""),
+        device_type=data.get("device_type", ""),
+        config_json=json.dumps(data.get("config", {})),
         conditions_json=json.dumps(data.get("conditions", {})),
         result_json=json.dumps(data.get("result", {})),
         calculation_time_ms=data.get("calculation_time_ms", 0),

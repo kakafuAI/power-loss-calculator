@@ -18,6 +18,8 @@ CREATE TABLE IF NOT EXISTS calculation_history (
     id INTEGER PRIMARY KEY AUTOINCREMENT,
     device_id INTEGER REFERENCES device_library(id) ON DELETE SET NULL,
     device_name TEXT DEFAULT '',
+    device_type TEXT DEFAULT '',
+    config_json TEXT NOT NULL DEFAULT '{}',
     conditions_json TEXT NOT NULL,
     result_json TEXT NOT NULL,
     calculation_time_ms REAL DEFAULT 0,

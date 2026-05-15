@@ -13,7 +13,5 @@ venv/
 
 # Exclude unrelated experiments
 lcsc_*
-package.json
-package-lock.json
 .npmrc
 spikes/

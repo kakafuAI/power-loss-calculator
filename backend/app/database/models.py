@@ -135,15 +135,17 @@ def save_calculation(
     t_j_max: float = 0,
     p_total_loss: float = 0,
     efficiency: float = 0,
+    device_type: str = "",
+    config_json: str = "{}",
 ) -> int:
     conn = get_connection()
     cur = conn.execute(
         """INSERT INTO calculation_history
-           (device_id, device_name, conditions_json, result_json, calculation_time_ms,
-            converged, t_j_max, p_total_loss, efficiency)
-           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)""",
-        (device_id, device_name, conditions_json, result_json, calculation_time_ms,
-         1 if converged else 0, t_j_max, p_total_loss, efficiency),
+           (device_id, device_name, device_type, config_json, conditions_json, result_json,
+            calculation_time_ms, converged, t_j_max, p_total_loss, efficiency)
+           VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)""",
+        (device_id, device_name, device_type, config_json, conditions_json, result_json,
+         calculation_time_ms, 1 if converged else 0, t_j_max, p_total_loss, efficiency),
     )
     conn.commit()
     calc_id = cur.lastrowid
