@@ -1,5 +1,37 @@
 # Changelog
 
+## [1.3.0] — 2026-05-16
+
+### Added
+- **DeepSeek LLM PDF 参数提取**: 基于大模型的规格书解析引擎 (llm_parser.py)，兼容 OpenAI SDK
+  - 自动提取 IGBT/SiC 全部电气和热参数，含多品牌格式适配
+  - JSON Schema 约束输出，置信度评分
+  - 失败自动回退 regex 解析器
+  - DEEPSEEK_API_KEY 通过 backend/.env 配置，启动时自动加载
+
+### Fixed
+- **器件库选型后计算报错**: 内置器件 points 格式 `[[x,y]]` → `[{current,energy}]`，前后端统一归一化兼容
+- **开关损耗始终为 0**: `_normalize_points` 不识别 Pydantic SwitchingPoint 对象，新增 `hasattr` 检测
+- **PDF 提取开关损耗参数缺失**: `handleUpload` 未将单点能量值映射到曲线 points 数组
+- **计算历史未记录**: `saveHistory` 前后端字段名不匹配（`config`→`device_name` 等）
+- **对比分析失败**: `selectedDevice.device_name`→`name` 字段修正；芯片型号未显示
+- **LLM 元数据缺失**: 提取 prompt 增加 `part_number` / `manufacturer` 字段
+
+### SiC/IGBT 全项目区分
+- **后端 topology.py**: 器件命名 `IGBT_H_U`→`SiC_MOS_H_U`，type 字段 `"IGBT"`→`"SiC MOSFET"` / `"Body Diode"`
+- **后端 topology.py**: 计算步骤标签全部 SiC 感知（`Rds(on)`/`Vsd`/`SiC MOSFET导通损耗`/`体二极管导通损耗`）
+- **前端 ResultDashboard**: 11 处硬编码"IGBT"改为 `isSiC` 分支；选型建议文案 SiC 自适应
+- **前端 LossPieChart**: 饼图标签区分 SiC MOSFET / 体二极管
+- **前端 ThermalNetworkDiagram**: Vce 初始化从 `sic_mos.rds_on` 读取；显示标签动态切换
+- **后端 models/calculation.py**: DeviceLoss 新增 `type` 字段
+
+### Changed
+- **参数面板合并**: 手动输入 + 规格书提取统一为单一视图，置信度颜色标识（绿≥80% / 橙 50-79% / 红 <50%）
+- **工况智能初始化**: 器件选择后 `vdc` / `i_out_rms` 自动按器件额定值预设（50% 额定）
+- **概念图解初始值**: 传入实际器件 config，滑块跟随器件参数同步
+- **对比分析增强**: 可从历史自动加载最新结果，显示型号 + 制造商
+- **raw_text_sample**: 扩展至 3000 字符
+
 ## [1.2.0] — 2026-05-14
 
 ### Added
