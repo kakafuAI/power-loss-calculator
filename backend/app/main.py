@@ -24,7 +24,7 @@ from .database.connection import init_db
 app = FastAPI(
     title="Power Loss Calculator",
     description="功率半导体器件损耗计算工具 - IGBT / SiC MOSFET",
-    version="1.2.0",
+    version="1.3.0",
 )
 
 app.add_middleware(
@@ -61,7 +61,7 @@ async def startup():
 
 @app.get("/api/health")
 async def health_check():
-    return {"status": "ok", "version": "1.2.0"}
+    return {"status": "ok", "version": "1.3.0"}
 
 
 # ──────────────────────────────────────────
