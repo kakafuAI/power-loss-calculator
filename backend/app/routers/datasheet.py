@@ -57,11 +57,14 @@ async def parse_datasheet(
                     extracted = llm_result_to_igbt_dict(cleaned)
                 extraction_method = "llm"
 
-                # Merge metadata from regex (part number / manufacturer)
-                if metadata.get("part_number"):
+                # Merge metadata: LLM first, then regex fallback
+                if not extracted.get("part_number") and metadata.get("part_number"):
                     extracted["part_number"] = metadata["part_number"]
-                if metadata.get("manufacturer"):
-                    extracted["manufacturer"] = metadata["manufacturer"]
+                if not extracted.get("manufacturer_name") and metadata.get("manufacturer"):
+                    extracted["manufacturer_name"] = metadata["manufacturer"]
+                # Also expose manufacturer under consistent key
+                if not extracted.get("manufacturer"):
+                    extracted["manufacturer"] = extracted.get("manufacturer_name") or metadata.get("manufacturer")
 
                 logger.info(
                     "LLM extraction successful for %s — %d params with confidence",

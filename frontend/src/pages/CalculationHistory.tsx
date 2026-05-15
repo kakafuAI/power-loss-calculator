@@ -73,7 +73,7 @@ export default function CalculationHistory({ onSelect }: Props) {
     {
       title: '效率', dataIndex: 'efficiency', width: 80,
       render: (v: number) => {
-        const pct = (v ?? 0) * 100;
+        const pct = v ?? 0;
         return <Tag color={pct > 95 ? 'green' : pct > 85 ? 'orange' : 'red'}>{pct.toFixed(1)}%</Tag>;
       },
     },

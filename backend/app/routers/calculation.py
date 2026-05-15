@@ -9,18 +9,34 @@ from ..engine.curves import sweep_output_current, sweep_switching_frequency, swe
 router = APIRouter()
 
 
+def _normalize_points(pts: list) -> list:
+    """Normalize points to [(current, energy), ...] regardless of input format.
+
+    Accepts: [{current: x, energy: y}, ...], [[x, y], ...], or Pydantic SwitchingPoint objects.
+    """
+    result = []
+    for p in pts:
+        if hasattr(p, 'current') and hasattr(p, 'energy'):
+            result.append((float(p.current), float(p.energy)))
+        elif isinstance(p, dict):
+            result.append((p.get("current", 0), p.get("energy", 0)))
+        elif isinstance(p, (list, tuple)) and len(p) >= 2:
+            result.append((float(p[0]), float(p[1])))
+    return result
+
+
 def _build_config(compact: ModuleConfigCompact) -> InverterConfig:
     """Convert frontend ModuleConfigCompact to engine InverterConfig."""
     is_sic = compact.device_type in (DeviceType.SIC_MODULE, DeviceType.SIC_DISCRETE)
 
     if is_sic and compact.sic_mos:
         mos = compact.sic_mos
-        eon_pts = [(p.current, p.energy) for p in mos.eon_curve.points]
-        eoff_pts = [(p.current, p.energy) for p in mos.eoff_curve.points]
+        eon_pts = _normalize_points(mos.eon_curve.points)
+        eoff_pts = _normalize_points(mos.eoff_curve.points)
         diode = compact.sic_diode if compact.sic_diode else compact.diode
         err_pts = []
         if diode and diode.err_curve:
-            err_pts = [(p.current, p.energy) for p in diode.err_curve.points]
+            err_pts = _normalize_points(diode.err_curve.points)
 
         return InverterConfig(
             is_sic=True,
@@ -45,12 +61,12 @@ def _build_config(compact: ModuleConfigCompact) -> InverterConfig:
     if not igbt:
         raise HTTPException(status_code=400, detail="IGBT parameters required")
 
-    eon_pts = [(p.current, p.energy) for p in igbt.eon_curve.points]
-    eoff_pts = [(p.current, p.energy) for p in igbt.eoff_curve.points]
+    eon_pts = _normalize_points(igbt.eon_curve.points)
+    eoff_pts = _normalize_points(igbt.eoff_curve.points)
     diode = compact.diode
     err_pts = []
     if diode and diode.err_curve.points:
-        err_pts = [(p.current, p.energy) for p in diode.err_curve.points]
+        err_pts = _normalize_points(diode.err_curve.points)
 
     brake_vce_25 = compact.brake_igbt.vce_sat_25 if compact.brake_igbt else 0.0
     brake_vce_125 = compact.brake_igbt.vce_sat_125 if compact.brake_igbt else 0.0

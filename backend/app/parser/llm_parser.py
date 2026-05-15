@@ -33,17 +33,20 @@ SYSTEM_PROMPT = """You are a power semiconductor datasheet parameter extraction 
 Your task is to extract electrical and thermal parameters from raw PDF text of a power device datasheet.
 
 Rules:
-1. Extract TYPICAL (typ) values whenever available. Ignore MAX/MIN unless typ is absent.
-2. Distinguish 25°C and 125°C (or 150°C for SiC) values when both are present.
-3. Normalize units: mΩ → keep as mΩ, V → V, A → A, mJ → mJ, K/W → K/W, nF → nF, μC → μC, ns → ns.
-4. For switching energy (Eon, Eoff, Err), also extract the reference conditions: Ic/Id, Vcc/Vdd, Rg.
-5. For multi-point switching energy curves, extract ALL (current, energy) pairs found in tables.
-6. If a parameter is not found in the text, set it to null.
-7. Return ONLY valid JSON — no markdown, no code fences, no comments.
-8. Assign a confidence score 0.0-1.0 for each extracted value based on how clearly it was identified."""
+1. First, identify the part number (ordering code) and manufacturer from the document header/footer.
+2. Extract TYPICAL (typ) values whenever available. Ignore MAX/MIN unless typ is absent.
+3. Distinguish 25°C and 125°C (or 150°C for SiC) values when both are present.
+4. Normalize units: mΩ → keep as mΩ, V → V, A → A, mJ → mJ, K/W → K/W, nF → nF, μC → μC, ns → ns.
+5. For switching energy (Eon, Eoff, Err), also extract the reference conditions: Ic/Id, Vcc/Vdd, Rg.
+6. For multi-point switching energy curves, extract ALL (current, energy) pairs found in tables.
+7. If a parameter is not found in the text, set it to null.
+8. Return ONLY valid JSON — no markdown, no code fences, no comments.
+9. Assign a confidence score 0.0-1.0 for each extracted value based on how clearly it was identified."""
 
 IGBT_SCHEMA = """
 {
+  "part_number": string | null,      // Device part number / ordering code
+  "manufacturer": string | null,     // Manufacturer name
   "vce_sat_25": number | null,       // Vce(sat) @ 25°C in V (typ)
   "vce_sat_125": number | null,      // Vce(sat) @ 125°C (or 150°C) in V (typ)
   "vce_rated": number | null,        // VCES / collector-emitter breakdown voltage in V
@@ -79,6 +82,8 @@ IGBT_SCHEMA = """
 
 SIC_SCHEMA = """
 {
+  "part_number": string | null,      // Device part number / ordering code
+  "manufacturer": string | null,     // Manufacturer name
   "rds_on_25": number | null,        // Rds(on) @ 25°C in mΩ (typ)
   "rds_on_125": number | null,       // Rds(on) @ 125°C or 150°C in mΩ (typ)
   "vds_rated": number | null,        // Drain-source breakdown voltage in V
@@ -280,6 +285,8 @@ def _validate_and_clean(parsed: dict, device_type: str) -> dict:
 def llm_result_to_igbt_dict(cleaned: dict) -> dict:
     """Convert LLM-extracted dict to the format expected by igbt_to_dict()."""
     return {
+        "part_number": cleaned.get("part_number"),
+        "manufacturer_name": cleaned.get("manufacturer"),
         "vce_sat_25": cleaned.get("vce_sat_25"),
         "vce_sat_125": cleaned.get("vce_sat_125"),
         "vce_rated": cleaned.get("vce_rated"),
@@ -317,6 +324,8 @@ def llm_result_to_igbt_dict(cleaned: dict) -> dict:
 def llm_result_to_sic_dict(cleaned: dict) -> dict:
     """Convert LLM-extracted dict to the format expected by sic_params_to_dict()."""
     return {
+        "part_number": cleaned.get("part_number"),
+        "manufacturer_name": cleaned.get("manufacturer"),
         "rds_on_25": cleaned.get("rds_on_25"),
         "rds_on_125": cleaned.get("rds_on_125"),
         "vds_rated": cleaned.get("vds_rated"),

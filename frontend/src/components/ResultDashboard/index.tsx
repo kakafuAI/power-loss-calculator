@@ -31,6 +31,13 @@ export default function ResultDashboard({
 }: Props) {
   const [curveData, setCurveData] = useState<Record<string, unknown>[]>([]);
   const [curveLoading, setCurveLoading] = useState(false);
+  const isSiC = config.device_type === 'sic_module' || config.device_type === 'sic_discrete';
+  const swLabel = isSiC ? 'SiC MOSFET' : 'IGBT';
+  const diodeLabel = isSiC ? '体二极管' : '二极管';
+  const swCondLabel = isSiC ? 'SiC MOSFET 导通损耗' : 'IGBT 导通损耗';
+  const swSwLabel = isSiC ? 'SiC MOSFET 开关损耗' : 'IGBT 开关损耗';
+  const diodeCondLabel = isSiC ? '体二极管导通损耗' : '二极管导通损耗';
+  const diodeSwLabel = isSiC ? '体二极管开关损耗' : '二极管开关损耗';
 
   const handleExportExcel = async () => {
     try {
@@ -114,7 +121,7 @@ export default function ResultDashboard({
     { title: '器件', dataIndex: 'name', key: 'name', width: 120 },
     {
       title: '类型', dataIndex: 'type', key: 'type', width: 70,
-      render: (t: string) => <Tag color={t === 'IGBT' ? 'blue' : 'orange'}>{t}</Tag>,
+      render: (t: string) => <Tag color={t.includes('SiC') ? 'green' : t === 'IGBT' ? 'blue' : 'orange'}>{t}</Tag>,
     },
     { title: '导通损耗 (W)', dataIndex: 'p_cond', key: 'p_cond', render: (v: number) => v.toFixed(2) },
     { title: '开关损耗 (W)', dataIndex: 'p_sw', key: 'p_sw', render: (v: number) => v.toFixed(2) },
@@ -229,7 +236,7 @@ export default function ResultDashboard({
               <Row gutter={[16, 16]}>
                 <Col span={12}>
                   <Card title="损耗分布" size="small">
-                    <LossPieChart result={result} />
+                    <LossPieChart result={result} isSiC={isSiC} />
                   </Card>
                 </Col>
                 <Col span={12}>
@@ -241,16 +248,16 @@ export default function ResultDashboard({
                   <Card title="损耗汇总" size="small">
                     <Row gutter={16}>
                       <Col span={5}>
-                        <Statistic title="IGBT 导通损耗" value={result.p_igbt_cond} suffix="W" precision={1} />
+                        <Statistic title={swCondLabel} value={result.p_igbt_cond} suffix="W" precision={1} />
                       </Col>
                       <Col span={5}>
-                        <Statistic title="IGBT 开关损耗" value={result.p_igbt_sw} suffix="W" precision={1} />
+                        <Statistic title={swSwLabel} value={result.p_igbt_sw} suffix="W" precision={1} />
                       </Col>
                       <Col span={5}>
-                        <Statistic title="二极管导通损耗" value={result.p_diode_cond} suffix="W" precision={1} />
+                        <Statistic title={diodeCondLabel} value={result.p_diode_cond} suffix="W" precision={1} />
                       </Col>
                       <Col span={5}>
-                        <Statistic title="二极管开关损耗" value={result.p_diode_sw} suffix="W" precision={1} />
+                        <Statistic title={diodeSwLabel} value={result.p_diode_sw} suffix="W" precision={1} />
                       </Col>
                       {result.p_brake_loss > 0 && (
                         <Col span={4}>
@@ -260,10 +267,10 @@ export default function ResultDashboard({
                     </Row>
                     {result.per_leg && (
                       <Descriptions size="small" column={4} style={{ marginTop: 12 }} bordered>
-                        <Descriptions.Item label="IGBT 平均电流">{result.per_leg.i_igbt_avg?.toFixed(2)} A</Descriptions.Item>
-                        <Descriptions.Item label="IGBT RMS 电流">{result.per_leg.i_igbt_rms?.toFixed(2)} A</Descriptions.Item>
-                        <Descriptions.Item label="Diode 平均电流">{result.per_leg.i_diode_avg?.toFixed(2)} A</Descriptions.Item>
-                        <Descriptions.Item label="Diode RMS 电流">{result.per_leg.i_diode_rms?.toFixed(2)} A</Descriptions.Item>
+                        <Descriptions.Item label={`${swLabel} 平均电流`}>{result.per_leg?.i_igbt_avg?.toFixed(2)} A</Descriptions.Item>
+                        <Descriptions.Item label={`${swLabel} RMS 电流`}>{result.per_leg?.i_igbt_rms?.toFixed(2)} A</Descriptions.Item>
+                        <Descriptions.Item label={`${diodeLabel} 平均电流`}>{result.per_leg?.i_diode_avg?.toFixed(2)} A</Descriptions.Item>
+                        <Descriptions.Item label={`${diodeLabel} RMS 电流`}>{result.per_leg?.i_diode_rms?.toFixed(2)} A</Descriptions.Item>
                       </Descriptions>
                     )}
                   </Card>
@@ -332,7 +339,7 @@ export default function ResultDashboard({
               <Card title="调制信号与输出电流" size="small">
                 <WaveformChart conditions={conditions} />
                 <Paragraph type="secondary" style={{ marginTop: 8 }}>
-                  显示一个基波周期内的调制信号、输出电流和上管占空比。IGBT 导通区间为占空比 D_H=1 且电流 i&gt;0 的区域。
+                  显示一个基波周期内的调制信号、输出电流和上管占空比。开关管导通区间为占空比 D_H=1 且电流 i&gt;0 的区域。
                 </Paragraph>
               </Card>
             ),
@@ -463,30 +470,30 @@ function SelectionAdvice({ result, config }: {
               <Row gutter={12} style={{ marginBottom: 12 }}>
                 <Col span={6}>
                   <Card size="small" style={{ background: '#f0f5ff' }}>
-                    <Text type="secondary" style={{ fontSize: 11 }}>IGBT 导通</Text>
+                    <Text type="secondary" style={{ fontSize: 11 }}>{swLabel} 导通</Text>
                     <div><Text strong style={{ fontSize: 16 }}>{lossBreakdown.igbtCondPct}%</Text></div>
                     <Text style={{ fontSize: 10 }}>{parseInt(lossBreakdown.igbtCondPct) > 40 ? '主导损耗，可降频改善' : '正常范围'}</Text>
                   </Card>
                 </Col>
                 <Col span={6}>
                   <Card size="small" style={{ background: '#fff7e6' }}>
-                    <Text type="secondary" style={{ fontSize: 11 }}>IGBT 开关</Text>
+                    <Text type="secondary" style={{ fontSize: 11 }}>{swLabel} 开关</Text>
                     <div><Text strong style={{ fontSize: 16 }}>{lossBreakdown.igbtSwPct}%</Text></div>
-                    <Text style={{ fontSize: 10 }}>{parseInt(lossBreakdown.igbtSwPct) > 40 ? '开关损耗突出，考虑降频或 SiC' : '正常范围'}</Text>
+                    <Text style={{ fontSize: 10 }}>{parseInt(lossBreakdown.igbtSwPct) > 40 ? '开关损耗突出，考虑降频' + (isSiC ? '' : '或 SiC') : '正常范围'}</Text>
                   </Card>
                 </Col>
                 <Col span={6}>
                   <Card size="small" style={{ background: '#f6ffed' }}>
-                    <Text type="secondary" style={{ fontSize: 11 }}>二极管 导通</Text>
+                    <Text type="secondary" style={{ fontSize: 11 }}>{diodeLabel} 导通</Text>
                     <div><Text strong style={{ fontSize: 16 }}>{lossBreakdown.diodeCondPct}%</Text></div>
                     <Text style={{ fontSize: 10 }}>{parseInt(lossBreakdown.diodeCondPct) > 30 ? '续流损耗偏高' : '正常范围'}</Text>
                   </Card>
                 </Col>
                 <Col span={6}>
                   <Card size="small" style={{ background: '#fff0f6' }}>
-                    <Text type="secondary" style={{ fontSize: 11 }}>二极管 开关</Text>
+                    <Text type="secondary" style={{ fontSize: 11 }}>{diodeLabel} 开关</Text>
                     <div><Text strong style={{ fontSize: 16 }}>{lossBreakdown.diodeSwPct}%</Text></div>
-                    <Text style={{ fontSize: 10 }}>{parseInt(lossBreakdown.diodeSwPct) > 15 ? '反向恢复明显' : '正常范围'}</Text>
+                    <Text style={{ fontSize: 10 }}>{parseInt(lossBreakdown.diodeSwPct) > 15 ? '反向恢复明显' : isSiC ? 'SiC 体二极管反向恢复极小' : '正常范围'}</Text>
                   </Card>
                 </Col>
               </Row>
@@ -514,9 +521,17 @@ function SelectionAdvice({ result, config }: {
                   <Text strong>选型方向建议</Text>
                   <div style={{ marginTop: 4 }}>
                     {parseInt(lossBreakdown?.igbtSwPct || '0') > 35 ? (
-                      <Text>开关损耗占比较高 → 考虑<Text strong>SiC MOSFET</Text>替代，降低开关损耗</Text>
+                      isSiC ? (
+                        <Text>开关损耗占比较高 → 考虑<Text strong>更低开关能量的 SiC 器件</Text>或降低开关频率</Text>
+                      ) : (
+                        <Text>开关损耗占比较高 → 考虑<Text strong>SiC MOSFET</Text>替代，降低开关损耗</Text>
+                      )
                     ) : parseInt(lossBreakdown?.igbtCondPct || '0') > 40 ? (
-                      <Text>导通损耗占比较高 → 考虑<Text strong>更低 Vce(sat)</Text>的器件或并联方案</Text>
+                      isSiC ? (
+                        <Text>导通损耗占比较高 → 考虑<Text strong>更低 Rds(on)</Text>的 SiC 器件或并联方案</Text>
+                      ) : (
+                        <Text>导通损耗占比较高 → 考虑<Text strong>更低 Vce(sat)</Text>的器件或并联方案</Text>
+                      )
                     ) : (
                       <Text>损耗分布均衡 → 当前器件选型基本合理</Text>
                     )}
@@ -537,14 +552,17 @@ function SelectionAdvice({ result, config }: {
                     return (
                       <List.Item>
                         <Space>
-                          <Text strong>{dev.device_name}</Text>
+                          <Text strong>{dev.name || dev.device_name}</Text>
                           <Text type="secondary">{dev.manufacturer}</Text>
                           <Tag>{dev.device_type}</Tag>
                           <Text type="secondary">
                             {devConfig.vdc_rated || '?'}V / {devConfig.ic_rated || '?'}A
                           </Text>
                           <Text type="secondary">
-                            Vce(sat): {devConfig.igbt?.vce_sat_25 || devConfig.sic_mos?.rds_on_25 || '?'}
+                            {dev.device_type?.startsWith('sic')
+                              ? `Rds(on): ${devConfig.sic_mos?.rds_on_25 ?? '?'}mΩ`
+                              : `Vce(sat): ${devConfig.igbt?.vce_sat_25 ?? '?'}V`
+                            }
                           </Text>
                         </Space>
                       </List.Item>

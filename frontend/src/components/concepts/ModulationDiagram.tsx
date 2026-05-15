@@ -1,13 +1,16 @@
 import { useState, useMemo, useEffect } from 'react';
 import { Slider, Typography, Row, Col, Tag } from 'antd';
+import type { ModuleConfig, OperatingConditions } from '../../types';
 const { Text } = Typography;
 const C = { blue: '#0984E3', green: '#00B894', orange: '#E17055', dark: '#2D3436', medium: '#636E72', light: '#DFE6E9' };
 
-interface Props { conditions?: { modulation_index?: number; modulation?: string }; }
-export default function ModulationDiagram({ conditions }: Props) {
+interface Props { config?: ModuleConfig; conditions?: OperatingConditions; }
+export default function ModulationDiagram({ config, conditions }: Props) {
   const [m, setM] = useState(conditions?.modulation_index ?? 1.0);
   const [mod, setMod] = useState(conditions?.modulation ?? 'spwm');
   const [ph, setPh] = useState(0);
+  useEffect(() => { if (conditions?.modulation_index != null) setM(conditions.modulation_index); }, [conditions?.modulation_index]);
+  useEffect(() => { if (conditions?.modulation) setMod(conditions.modulation); }, [conditions?.modulation]);
   useEffect(() => { const id = setInterval(() => setPh(p => p + 1), 50); return () => clearInterval(id); }, []);
 
   const maxM = mod === 'spwm' ? 1.0 : 1.15;

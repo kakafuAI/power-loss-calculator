@@ -108,32 +108,36 @@ def calculate_inverter_losses(
     ) if config.err_points else lambda ic: 0.0
 
     # ── Thermal iteration ──────────────────────────────────────────
-    # Define 14 devices: 6 IGBT, 6 diode, 1 brake IGBT, 1 brake diode
+    # Define 14 devices: 6 switches, 6 diodes, 1 brake switch, 1 brake diode
+    sw_prefix = "SiC_MOS" if config.is_sic else "IGBT"
+    sw_type = "SiC MOSFET" if config.is_sic else "IGBT"
+    diode_prefix = "SiC_BD" if config.is_sic else "Diode"
+    diode_type = "Body Diode" if config.is_sic else "Diode"
 
     device_names = []
     for phase in ["U", "V", "W"]:
         for pos in ["H", "L"]:
-            device_names.append(f"IGBT_{pos}_{phase}")
+            device_names.append(f"{sw_prefix}_{pos}_{phase}")
     for phase in ["U", "V", "W"]:
         for pos in ["H", "L"]:
-            device_names.append(f"Diode_{pos}_{phase}")
+            device_names.append(f"{diode_prefix}_{pos}_{phase}")
     if config.has_brake:
-        device_names.append("IGBT_Brake")
-        device_names.append("Diode_Brake")
+        device_names.append(f"{sw_prefix}_Brake")
+        device_names.append(f"{diode_prefix}_Brake")
 
     t_j_initial = op.t_ambient + 40.0  # Initial guess
 
     def loss_calculator(t_j_dict: dict) -> dict:
         """Compute loss for each device given Tj map."""
         losses = {}
+        brake_sw = f"{sw_prefix}_Brake"
+        brake_di = f"{diode_prefix}_Brake"
         for name in device_names:
-            if name.startswith("IGBT_Brake"):
+            if name == brake_sw or name == brake_di:
                 losses[name] = 0.0
-            elif name.startswith("Diode_Brake"):
-                losses[name] = 0.0
-            elif name.startswith("IGBT"):
+            elif name.startswith(sw_prefix):
                 losses[name] = 0.0  # placeholder, computed below
-            elif name.startswith("Diode"):
+            elif name.startswith(diode_prefix):
                 losses[name] = 0.0  # placeholder
         return losses
 
@@ -286,42 +290,42 @@ def calculate_inverter_losses(
             ("L", p_cond_igbt_l, p_sw_igbt_l, float(t_j_igbt[phase_idx * 2 + 1])),
         ]:
             devices.append({
-                "name": f"IGBT_{pos}_{phase}",
+                "name": f"{sw_prefix}_{pos}_{phase}",
                 "p_cond": round(p_cond, 3),
                 "p_sw": round(p_sw, 3),
                 "p_total": round(p_cond + p_sw, 3),
                 "t_j": round(t_j_val, 2),
-                "type": "IGBT",
+                "type": sw_type,
             })
         for pos, p_cond, p_sw, t_j_val in [
             ("H", p_cond_diode_h, p_sw_diode_h, float(t_j_diode[phase_idx * 2])),
             ("L", p_cond_diode_l, p_sw_diode_l, float(t_j_diode[phase_idx * 2 + 1])),
         ]:
             devices.append({
-                "name": f"Diode_{pos}_{phase}",
+                "name": f"{diode_prefix}_{pos}_{phase}",
                 "p_cond": round(p_cond, 3),
                 "p_sw": round(p_sw, 3),
                 "p_total": round(p_cond + p_sw, 3),
                 "t_j": round(t_j_val, 2),
-                "type": "Diode",
+                "type": diode_type,
             })
 
     if config.has_brake:
         devices.append({
-            "name": "IGBT_Brake",
+            "name": f"{sw_prefix}_Brake",
             "p_cond": round(p_brake_igbt, 3),
             "p_sw": 0.0,
             "p_total": round(p_brake_igbt, 3),
             "t_j": round(float(t_j_brake_igbt), 2),
-            "type": "IGBT",
+            "type": sw_type,
         })
         devices.append({
-            "name": "Diode_Brake",
+            "name": f"{diode_prefix}_Brake",
             "p_cond": round(p_brake_diode, 3),
             "p_sw": 0.0,
             "p_total": round(p_brake_diode, 3),
             "t_j": round(float(t_j_brake_diode), 2),
-            "type": "Diode",
+            "type": diode_type,
         })
 
     # Aggregates
@@ -399,30 +403,38 @@ def _build_steps(config, op, cond_igbt, cond_diode, sw, iter_log,
         },
     })
 
+    sw_dev_name = "SiC MOSFET" if config.is_sic else "IGBT"
+    diode_dev_name = "体二极管" if config.is_sic else "二极管"
+    cond_formula = "Pcond = Rds(on)(Tj) × Id² × D(θ)" if config.is_sic else "Pcond = Vce(sat)(Tj) × Ic × D(θ)"
+    cond_param = f"Rds(on) @ Tj: {config.rds_on_25} ~ {config.rds_on_125} mΩ" if config.is_sic else f"Vce(sat) @ Tj: {config.vce_sat_25} ~ {config.vce_sat_125} V"
+    vf_label = "Vsd @ Tj" if config.is_sic else "Vf @ Tj"
+    vf_values = f"{config.vsd_25} ~ {config.vsd_125} V" if config.is_sic else f"{config.vf_25} ~ {config.vf_125} V"
+    diode_formula = "Pcond = Vsd(Tj) × If × (1-D(θ))" if config.is_sic else "Pcond_Diode = Vf(Tj) × If × (1-D(θ))"
+
     steps.append({
-        "title": "导通损耗计算",
+        "title": f"{sw_dev_name}导通损耗计算",
         "type": "calculation",
-        "formula": "Pcond_IGBT = Vce(sat)(Tj) × Ic × D(θ), 数值积分",
+        "formula": f"{cond_formula}, 数值积分",
         "data": {
-            "Vce(sat) @ Tj": f"{config.vce_sat_25} ~ {config.vce_sat_125} V",
-            "IGBT 导通损耗 (每相)": f"{cond_igbt['p_cond']:.3f} W",
-            "IGBT 上管导通损耗": f"{cond_igbt['p_cond_high']:.3f} W",
-            "IGBT 下管导通损耗": f"{cond_igbt['p_cond_low']:.3f} W",
-            "IGBT 上管平均电流": f"{cond_igbt['i_avg_high']:.3f} A",
-            "IGBT 上管RMS电流": f"{cond_igbt['i_rms_high']:.3f} A",
-            "IGBT 上管等效占空比": f"{cond_igbt['duty_high']:.4f}",
+            cond_param.split(":")[0].strip(): cond_param.split(":", 1)[1].strip() if ":" in cond_param else cond_param,
+            f"{sw_dev_name} 导通损耗 (每相)": f"{cond_igbt['p_cond']:.3f} W",
+            f"{sw_dev_name} 上管导通损耗": f"{cond_igbt['p_cond_high']:.3f} W",
+            f"{sw_dev_name} 下管导通损耗": f"{cond_igbt['p_cond_low']:.3f} W",
+            f"{sw_dev_name} 上管平均电流": f"{cond_igbt['i_avg_high']:.3f} A",
+            f"{sw_dev_name} 上管RMS电流": f"{cond_igbt['i_rms_high']:.3f} A",
+            f"{sw_dev_name} 上管等效占空比": f"{cond_igbt['duty_high']:.4f}",
         },
     })
 
     steps.append({
-        "title": "二极管导通损耗计算",
+        "title": f"{diode_dev_name}导通损耗计算",
         "type": "calculation",
-        "formula": "Pcond_Diode = Vf(Tj) × If × (1-D(θ)), 数值积分",
+        "formula": f"{diode_formula}, 数值积分",
         "data": {
-            "Vf @ Tj": f"{config.vf_25} ~ {config.vf_125} V",
-            "二极管导通损耗 (每相)": f"{cond_diode['p_cond']:.3f} W",
-            "二极管上管导通损耗": f"{cond_diode['p_cond_high']:.3f} W",
-            "二极管下管导通损耗": f"{cond_diode['p_cond_low']:.3f} W",
+            f"{vf_label}": vf_values,
+            f"{diode_dev_name}导通损耗 (每相)": f"{cond_diode['p_cond']:.3f} W",
+            f"{diode_dev_name}上管导通损耗": f"{cond_diode['p_cond_high']:.3f} W",
+            f"{diode_dev_name}下管导通损耗": f"{cond_diode['p_cond_low']:.3f} W",
         },
     })
 
@@ -434,8 +446,8 @@ def _build_steps(config, op, cond_igbt, cond_diode, sw, iter_log,
             "平均Eon (每次开关)": f"{sw['avg_eon_mj']:.4f} mJ",
             "平均Eoff (每次开关)": f"{sw['avg_eoff_mj']:.4f} mJ",
             "平均Err (每次开关)": f"{sw['avg_err_mj']:.4f} mJ",
-            "IGBT开关损耗 (每相)": f"{sw['p_sw_igbt']:.3f} W",
-            "二极管反向恢复损耗 (每相)": f"{sw['p_sw_diode']:.3f} W",
+            f"{sw_dev_name}开关损耗 (每相)": f"{sw['p_sw_igbt']:.3f} W",
+            f"{diode_dev_name}反向恢复损耗 (每相)": f"{sw['p_sw_diode']:.3f} W",
         },
     })
 
@@ -449,10 +461,10 @@ def _build_steps(config, op, cond_igbt, cond_diode, sw, iter_log,
         "title": "总损耗汇总",
         "type": "summary",
         "data": {
-            "IGBT总导通损耗": f"{3 * cond_igbt['p_cond']:.2f} W",
-            "IGBT总开关损耗": f"{3 * sw['p_sw_igbt']:.2f} W",
-            "二极管总导通损耗": f"{3 * cond_diode['p_cond']:.2f} W",
-            "二极管总开关损耗": f"{3 * sw['p_sw_diode']:.2f} W",
+            f"{sw_dev_name}总导通损耗": f"{3 * cond_igbt['p_cond']:.2f} W",
+            f"{sw_dev_name}总开关损耗": f"{3 * sw['p_sw_igbt']:.2f} W",
+            f"{diode_dev_name}总导通损耗": f"{3 * cond_diode['p_cond']:.2f} W",
+            f"{diode_dev_name}总开关损耗": f"{3 * sw['p_sw_diode']:.2f} W",
             "总损耗": f"{p_total:.2f} W",
             "效率": f"{efficiency:.2f}%",
         },

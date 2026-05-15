@@ -1,27 +1,53 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Slider, Typography, Table, Row, Col, Statistic, Tag } from 'antd';
+import type { ModuleConfig, OperatingConditions } from '../../types';
 const { Text } = Typography;
 const C = { blue: '#0984E3', green: '#00B894', orange: '#E17055', red: '#D63031', purple: '#6C5CE7', dark: '#2D3436', medium: '#636E72', light: '#DFE6E9' };
 
+interface Props { config?: ModuleConfig; conditions?: OperatingConditions; }
+
 // ── Iteration solver ──────────────────────────────────────────────────
-function vceAt(tj: number) { return 1.70 + (2.05 - 1.70) * (Math.max(25, Math.min(200, tj)) - 25) / 100; }
-function solveIteration(tInit: number, tAmb: number, totalRth: number, baseLoss: number, th: number) {
+function vceAt(tj: number, vce25: number = 1.70, vce125: number = 2.05) {
+  const slope = (vce125 - vce25) / 100;
+  return vce25 + slope * (Math.max(25, Math.min(200, tj)) - 25);
+}
+function solveIteration(tInit: number, tAmb: number, totalRth: number, baseLoss: number, th: number, vce25: number, vce125: number) {
   const r: any[] = []; let tjG = tInit;
   for (let i = 1; i <= 30; i++) {
-    const vs = vceAt(tjG), pL = baseLoss * (vs / 1.70), tJ = tAmb + pL * totalRth, d = Math.abs(tJ - tjG);
+    const vs = vceAt(tjG, vce25, vce125), pL = baseLoss * (vs / vce25), tJ = tAmb + pL * totalRth, d = Math.abs(tJ - tjG);
     r.push({ iter: i, tjGuess: tjG, vceSat: vs, pLoss: pL, tJ, delta: d });
     if (d < th && i > 2) break;
     tjG = tjG * 0.7 + tJ * 0.3;
   } return r;
 }
 
-export default function ThermalNetworkDiagram() {
+export default function ThermalNetworkDiagram({ config, conditions }: Props) {
+  const isSiC = config?.device_type === 'sic_module' || config?.device_type === 'sic_discrete';
+  const condParam = isSiC ? 'Rds(on)' : 'Vce(sat)';
+  const condUnit = isSiC ? 'mΩ' : 'V';
+  const initRthJc = config?.igbt?.thermal?.rth_jc ?? config?.sic_mos?.thermal?.rth_jc ?? 0.24;
+  const initRthCh = config?.rth_ch_module ?? 0.04;
+  const initRthHa = config?.rth_ha ?? 0.30;
+  const initTAmb = conditions?.t_ambient ?? 40;
+  const initVce25 = isSiC
+    ? (config?.sic_mos?.rds_on_25 ?? 20)
+    : (config?.igbt?.vce_sat_25 ?? 1.70);
+  const initVce125 = isSiC
+    ? (config?.sic_mos?.rds_on_125 ?? 35)
+    : (config?.igbt?.vce_sat_125 ?? 2.05);
+
   const [pLoss, setPLoss] = useState(120);
-  const [rthJc, setRthJc] = useState(0.24);
-  const [rthCh, setRthCh] = useState(0.04);
-  const [rthHa, setRthHa] = useState(0.30);
-  const [tAmb] = useState(40);
+  const [rthJc, setRthJc] = useState(initRthJc);
+  const [rthCh, setRthCh] = useState(initRthCh);
+  const [rthHa, setRthHa] = useState(initRthHa);
+  const [tAmb] = useState(initTAmb);
   const [showIter, setShowIter] = useState(true);
+
+  useEffect(() => {
+    if (config) {
+      setRthJc(initRthJc); setRthCh(initRthCh); setRthHa(initRthHa);
+    }
+  }, [config?.igbt?.thermal?.rth_jc, config?.sic_mos?.thermal?.rth_jc, config?.rth_ch_module, config?.rth_ha]);
 
   const totalRth = rthJc + rthCh + rthHa;
   // Cauer temperatures (bottom-up calculation)
@@ -34,8 +60,8 @@ export default function ThermalNetworkDiagram() {
   // Iteration
   const baseLossTotal = pLoss * 6;
   const iterations = useMemo(
-    () => solveIteration(80, tAmb, totalRth, baseLossTotal, 0.5),
-    [tAmb, totalRth, baseLossTotal]
+    () => solveIteration(80, tAmb, totalRth, baseLossTotal, 0.5, initVce25, initVce125),
+    [tAmb, totalRth, baseLossTotal, initVce25, initVce125]
   );
   const iterCount = iterations.length;
   const finalTj = iterCount > 0 ? iterations[iterCount - 1].tJ : tJ;
@@ -203,8 +229,8 @@ export default function ThermalNetworkDiagram() {
               <div style={{ background: 'rgba(225,112,85,0.06)', borderRadius: 8, padding: 12, marginBottom: 8, border: '1px solid rgba(225,112,85,0.15)' }}>
                 <Text strong style={{ color: C.orange, fontSize: 13 }}>求解 Cauer/Foster 网络的迭代过程</Text>
                 <div style={{ fontSize: 12, color: C.medium, lineHeight: 1.8, marginTop: 4 }}>
-                  <div>1. 猜测 Tj → 查 Vce(sat)@Tj <span style={{ color: C.orange }}>(Vce随Tj↑)</span></div>
-                  <div>2. 计算 P = f(Vce(sat)) <span style={{ color: C.red }}>(Vce↑→P↑)</span></div>
+                  <div>1. 猜测 Tj → 查 {condParam}@Tj <span style={{ color: C.orange }}>({condParam}随Tj↑)</span></div>
+                  <div>2. 计算 P = f({condParam}) <span style={{ color: C.red }}>({condParam}↑→P↑)</span></div>
                   <div>3. Tj_new = Tamb + P × <strong style={{ color: C.blue }}>ΣRth</strong> <span style={{ color: C.orange }}>(P↑→Tj↑)</span></div>
                   <div>4. Δ = |Tj_new—Tj_old|，若 Δ&gt;阈值→回1</div>
                   <div style={{ marginTop: 4, fontWeight: 'bold', color: C.orange }}>
@@ -220,7 +246,7 @@ export default function ThermalNetworkDiagram() {
                   <div style={{ fontSize: 11, color: '#666', marginTop: 4 }}>
                     <div>Tj ≈ {noIterTj.toFixed(0)}°C</div>
                     <div>P ≈ {baseLossTotal.toFixed(0)}W</div>
-                    <div style={{ fontSize: 10, color: '#D4380D', marginTop: 2 }}>▲ 未考虑Vce(sat)温升</div>
+                    <div style={{ fontSize: 10, color: '#D4380D', marginTop: 2 }}>▲ 未考虑{condParam}温升</div>
                   </div>
                 </div>
                 <div style={{ background: '#F6FFED', borderRadius: 8, padding: 10, border: '1px solid #B7EB8F' }}>
@@ -265,7 +291,7 @@ export default function ThermalNetworkDiagram() {
               <Row gutter={8} style={{ marginTop: 4 }}>
                 <Col span={6}><Statistic title="迭代" value={iterCount} valueStyle={{ fontSize: 14 }} /></Col>
                 <Col span={6}><Statistic title="收敛Tj" value={`${finalTj.toFixed(1)}°C`} valueStyle={{ fontSize: 14, color: C.green }} /></Col>
-                <Col span={6}><Statistic title="Vce(sat)" value={`${iterations[iterCount-1]?.vceSat.toFixed(2) || '-'}V`} valueStyle={{ fontSize: 14 }} /></Col>
+                <Col span={6}><Statistic title={condParam} value={`${iterations[iterCount-1]?.vceSat.toFixed(2) || '-'} ${condUnit}`} valueStyle={{ fontSize: 14 }} /></Col>
                 <Col span={6}><Statistic title="修正" value={`+${((finalLoss/baseLossTotal-1)*100).toFixed(1)}%`} valueStyle={{ fontSize: 14, color: C.orange }} /></Col>
               </Row>
             </div>
@@ -278,7 +304,7 @@ export default function ThermalNetworkDiagram() {
         <Text style={{ fontSize: 12, color: C.medium }}>
           Cauer 网络的每个节点对应真实物理层温度，而 Foster 网络的参数来自数据手册的 Zth 曲线拟合（节点没有物理含义）。
           但在稳态 (t→∞) 下两者都退化为 Tj = Tamb + P × ({rthJc.toFixed(2)} + {rthCh.toFixed(2)} + {rthHa.toFixed(2)}) = <strong style={{ color: C.red }}>{tJ.toFixed(1)}°C</strong>。
-          {iterDeviation > 3 && <span> &nbsp; 考虑 Vce(sat) 温漂后迭代修正 <strong style={{ color: C.orange }}>{iterDeviation.toFixed(1)}%</strong>。</span>}
+          {iterDeviation > 3 && <span> &nbsp; 考虑 {condParam} 温漂后迭代修正 <strong style={{ color: C.orange }}>{iterDeviation.toFixed(1)}%</strong>。</span>}
         </Text>
       </div>
     </div>

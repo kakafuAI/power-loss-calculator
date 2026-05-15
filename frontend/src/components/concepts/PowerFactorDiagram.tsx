@@ -1,11 +1,16 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Slider, Typography, Row, Col, Statistic } from 'antd';
+import type { ModuleConfig, OperatingConditions } from '../../types';
 const { Text } = Typography;
 const C = { blue: '#0984E3', green: '#00B894', orange: '#E17055', purple: '#6C5CE7', red: '#D63031', dark: '#2D3436', medium: '#636E72', light: '#DFE6E9' };
 
-export default function PowerFactorDiagram() {
-  const [pf, setPf] = useState(0.85);
-  const [vdc, setVdc] = useState(600);
+interface Props { config?: ModuleConfig; conditions?: OperatingConditions; }
+
+export default function PowerFactorDiagram({ config, conditions }: Props) {
+  const [pf, setPf] = useState(conditions?.power_factor ?? 0.85);
+  const [vdc, setVdc] = useState(conditions?.vdc ?? 600);
+  useEffect(() => { if (conditions?.power_factor != null) setPf(conditions.power_factor); }, [conditions?.power_factor]);
+  useEffect(() => { if (conditions?.vdc != null) setVdc(conditions.vdc); }, [conditions?.vdc]);
   const [pOut, setPOut] = useState(30);
 
   const phi = Math.acos(pf);

@@ -4,6 +4,7 @@ import {
   ThunderboltOutlined, SwapOutlined, DashboardOutlined,
   ExperimentOutlined, HeatMapOutlined, SoundOutlined,
 } from '@ant-design/icons';
+import type { ModuleConfig, OperatingConditions } from '../../types';
 import ModulationDiagram from './ModulationDiagram';
 import PowerFactorDiagram from './PowerFactorDiagram';
 import ConductionLossDiagram from './ConductionLossDiagram';
@@ -14,7 +15,8 @@ import THDiDiagram from './THDiDiagram';
 const { Title, Paragraph } = Typography;
 
 interface Props {
-  conditions?: { vdc: number; i_out_rms: number; f_sw: number; f_out: number; modulation_index: number; power_factor: number; modulation: string };
+  config?: ModuleConfig;
+  conditions?: OperatingConditions;
 }
 
 const concepts = [
@@ -26,7 +28,7 @@ const concepts = [
   { key: 'thdi', label: 'THDi 谐波影响', icon: <SoundOutlined />, component: THDiDiagram },
 ];
 
-export default function ConceptExplorer({ conditions }: Props) {
+export default function ConceptExplorer({ config, conditions }: Props) {
   const [activeConcept, setActiveConcept] = useState('modulation');
 
   const ActiveComponent = concepts.find(c => c.key === activeConcept)?.component;
@@ -35,7 +37,7 @@ export default function ConceptExplorer({ conditions }: Props) {
     <div style={{ padding: 16 }}>
       <Title level={4}>📖 交互式概念图解</Title>
       <Paragraph type="secondary">
-        拖动滑块、切换选项，直观理解功率器件的关键物理概念。当前参数来自你的工况设置。
+        拖动滑块、切换选项，直观理解功率器件的关键物理概念。当前参数来自你的器件规格和工况设置。
       </Paragraph>
 
       <Space wrap style={{ marginBottom: 24 }}>
@@ -52,7 +54,7 @@ export default function ConceptExplorer({ conditions }: Props) {
       </Space>
 
       <Card>
-        {ActiveComponent && <ActiveComponent conditions={conditions} />}
+        {ActiveComponent && <ActiveComponent config={config} conditions={conditions} />}
       </Card>
     </div>
   );

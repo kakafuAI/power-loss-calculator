@@ -101,6 +101,19 @@ def _precompute_benchmarks():
     conn.close()
 
 
+def _normalize_pts(pts: list) -> list[tuple]:
+    """Normalize points to [(current, energy), ...] regardless of format."""
+    result = []
+    for p in pts:
+        if hasattr(p, 'current') and hasattr(p, 'energy'):
+            result.append((float(p.current), float(p.energy)))
+        elif isinstance(p, dict):
+            result.append((p.get("current", 0), p.get("energy", 0)))
+        elif isinstance(p, (list, tuple)) and len(p) >= 2:
+            result.append((float(p[0]), float(p[1])))
+    return result
+
+
 def _build_engine_config(config_dict: dict) -> "InverterConfig":
     """Build InverterConfig from a stored config dict."""
     from ..engine.topology import InverterConfig
@@ -119,13 +132,10 @@ def _build_engine_config(config_dict: dict) -> "InverterConfig":
     if is_sic and sic_mos:
         eon_curve = sic_mos.get("eon_curve", {})
         eoff_curve = sic_mos.get("eoff_curve", {})
-        for p in eon_curve.get("points", []):
-            eon_pts.append((p["current"], p["energy"]))
-        for p in eoff_curve.get("points", []):
-            eoff_pts.append((p["current"], p["energy"]))
+        eon_pts = _normalize_pts(eon_curve.get("points", []))
+        eoff_pts = _normalize_pts(eoff_curve.get("points", []))
         if sic_diode and sic_diode.get("err_curve"):
-            for p in sic_diode["err_curve"].get("points", []):
-                err_pts.append((p["current"], p["energy"]))
+            err_pts = _normalize_pts(sic_diode["err_curve"].get("points", []))
 
         return InverterConfig(
             is_sic=True,
@@ -150,13 +160,10 @@ def _build_engine_config(config_dict: dict) -> "InverterConfig":
     # IGBT
     eon_curve = igbt.get("eon_curve", {})
     eoff_curve = igbt.get("eoff_curve", {})
-    for p in eon_curve.get("points", []):
-        eon_pts.append((p["current"], p["energy"]))
-    for p in eoff_curve.get("points", []):
-        eoff_pts.append((p["current"], p["energy"]))
+    eon_pts = _normalize_pts(eon_curve.get("points", []))
+    eoff_pts = _normalize_pts(eoff_curve.get("points", []))
     if diode and diode.get("err_curve"):
-        for p in diode["err_curve"].get("points", []):
-            err_pts.append((p["current"], p["energy"]))
+        err_pts = _normalize_pts(diode["err_curve"].get("points", []))
 
     return InverterConfig(
         vce_sat_25=igbt.get("vce_sat_25", 1.7),

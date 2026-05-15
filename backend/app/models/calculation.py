@@ -30,7 +30,8 @@ class OperatingConditions(BaseModel):
 
 class DeviceLoss(BaseModel):
     """Loss breakdown for a single semiconductor device."""
-    name: str                          # e.g. "IGBT_H_U", "Diode_L_W"
+    name: str                          # e.g. "IGBT_H_U", "SiC_MOS_H_U"
+    type: str = ""                     # "IGBT", "SiC MOSFET", "Diode", "Body Diode"
     p_cond: float = 0.0                # Conduction loss (W)
     p_sw: float = 0.0                  # Switching loss (W)
     p_total: float = 0.0               # Total loss (W)

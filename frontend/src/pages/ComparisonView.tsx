@@ -20,33 +20,60 @@ export default function ComparisonView({ result, config, conditions }: Props) {
   const [comparing, setComparing] = useState(false);
   const [compareResult, setCompareResult] = useState<any>(null);
 
-  // Load all devices from library
+  // Load all devices from library, and latest result if not provided
+  const [currentResult, setCurrentResult] = useState(result);
+  const [currentConfig, setCurrentConfig] = useState(config);
+  const [currentConditions, setCurrentConditions] = useState(conditions);
+
+  useEffect(() => {
+    if (result) { setCurrentResult(result); setCurrentConfig(config); setCurrentConditions(conditions); }
+  }, [result, config, conditions]);
+
   useEffect(() => {
     axios.get('/api/devices?limit=100').then(({ data }) => {
       setDevices(data.devices || []);
     }).catch(() => {});
+    // If no result from props, try loading latest from history
+    if (!result) {
+      axios.get('/api/history?limit=1').then(({ data }) => {
+        const recs = data.history || [];
+        if (recs.length > 0) {
+          const rec = recs[0];
+          try {
+            const cfg = JSON.parse(rec.config_json || '{}');
+            if (cfg.device_type) {
+              setCurrentConfig(cfg);
+              setCurrentConditions(JSON.parse(rec.conditions_json || '{}'));
+              setCurrentResult(JSON.parse(rec.result_json || '{}'));
+            }
+          } catch {}
+        }
+      }).catch(() => {});
+    }
   }, []);
 
   // Filter devices by same type and similar current/voltage rating
+  const activeConfig = currentConfig || config;
+  const activeConditions = currentConditions || conditions;
+  const activeResult = currentResult || result;
+
   const compatibleDevices = useMemo(() => {
-    if (!config) return [];
-    const curType = config.device_type;
-    const curVdc = config.vdc_rated || 0;
-    const curIc = config.ic_rated || 0;
+    if (!activeConfig) return [];
+    const curType = activeConfig.device_type;
+    const curVdc = activeConfig.vdc_rated || 0;
+    const curIc = activeConfig.ic_rated || 0;
     return devices.filter((d: any) => {
-      // Same device type family
       if (d.device_type !== curType) return false;
       try {
         const devConfig = JSON.parse(d.config_json);
         const dVdc = devConfig.vdc_rated || 0;
         const dIc = devConfig.ic_rated || 0;
-        // Within ±30% of rated voltage and current, or same current grade
         const vdcMatch = curVdc === 0 || dVdc === 0 || (dVdc >= curVdc * 0.7 && dVdc <= curVdc * 1.3);
         const icMatch = curIc === 0 || dIc === 0 || (dIc >= curIc * 0.5 && dIc <= curIc * 2.0);
         return vdcMatch && icMatch;
       } catch { return false; }
     });
-  }, [devices, config]);
+  }, [devices, activeConfig]);
 
   const handleCompare = async (device: any) => {
     setSelectedDevice(device);
@@ -129,9 +156,10 @@ export default function ComparisonView({ result, config, conditions }: Props) {
   ];
 
   // Current device summary
-  const currentSummary = result ? {
-    name: config?.module_name || config?.manufacturer || '当前器件',
-    type: config?.device_type || '未知',
+  const currentSummary = activeResult ? {
+    name: activeConfig?.module_name || '当前器件',
+    manufacturer: activeConfig?.manufacturer || '',
+    type: activeConfig?.device_type || '未知',
     pTotal: result.p_total_loss,
     efficiency: result.efficiency,
     tJMax: result.t_j_max,
@@ -140,7 +168,8 @@ export default function ComparisonView({ result, config, conditions }: Props) {
   } : null;
 
   const compareSummary = compareResult ? {
-    name: selectedDevice?.device_name || '对比器件',
+    name: selectedDevice?.name || selectedDevice?.device_name || '对比器件',
+    manufacturer: selectedDevice?.manufacturer || '',
     type: selectedDevice?.device_type || '未知',
     pTotal: compareResult.p_total_loss,
     efficiency: compareResult.efficiency,
@@ -227,7 +256,7 @@ export default function ComparisonView({ result, config, conditions }: Props) {
         选择器件库中<Text strong>同类型、同档次</Text>的器件，在相同工况下运行计算并对比关键指标。
       </Paragraph>
 
-      {!result && (
+      {!activeResult && (
         <Alert
           type="info"
           showIcon
@@ -251,7 +280,7 @@ export default function ComparisonView({ result, config, conditions }: Props) {
               </Descriptions>
               <Descriptions size="small" column={1} style={{ marginTop: 8 }}>
                 <Descriptions.Item label="工况">
-                  {conditions?.vdc}V / {conditions?.i_out_rms}A / {(conditions?.f_sw || 4000) / 1000}kHz / cosφ={conditions?.power_factor}
+                  {activeConditions?.vdc}V / {conditions?.i_out_rms}A / {(conditions?.f_sw || 4000) / 1000}kHz / cosφ={conditions?.power_factor}
                 </Descriptions.Item>
               </Descriptions>
             </Card>
@@ -287,10 +316,11 @@ export default function ComparisonView({ result, config, conditions }: Props) {
                 <Text strong style={{ color: '#1677ff' }}>
                   <CheckCircleOutlined /> {currentSummary.name}
                 </Text>
+                {currentSummary.manufacturer && <div><Text type="secondary" style={{ fontSize: 11 }}>{currentSummary.manufacturer}</Text></div>}
                 <Row gutter={8} style={{ marginTop: 8 }}>
                   <Col span={12}><Statistic title="总损耗" value={currentSummary.pTotal.toFixed(0)} suffix="W" valueStyle={{ fontSize: 18 }} /></Col>
                   <Col span={12}><Statistic title="效率" value={currentSummary.efficiency.toFixed(1)} suffix="%" valueStyle={{ fontSize: 18 }} /></Col>
-                  <Col span={12}><Statistic title="Tj_max" value={`${currentSummary.tJMax.toFixed(1)}°C`} valueStyle={{ fontSize: 16, color: currentSummary.tJMax > (config?.t_j_max || 150) ? '#cf1322' : '#3f8600' }} /></Col>
+                  <Col span={12}><Statistic title="Tj_max" value={`${currentSummary.tJMax.toFixed(1)}°C`} valueStyle={{ fontSize: 16, color: currentSummary.tJMax > (activeConfig?.t_j_max || 150) ? '#cf1322' : '#3f8600' }} /></Col>
                   <Col span={12}><Statistic title="开关损耗" value={currentSummary.pSw.toFixed(0)} suffix="W" valueStyle={{ fontSize: 16 }} /></Col>
                 </Row>
               </Card>
@@ -306,10 +336,11 @@ export default function ComparisonView({ result, config, conditions }: Props) {
                 <Text strong style={{ color: '#52c41a' }}>
                   <CheckCircleOutlined /> {compareSummary.name}
                 </Text>
+                {compareSummary.manufacturer && <div><Text type="secondary" style={{ fontSize: 11 }}>{compareSummary.manufacturer}</Text></div>}
                 <Row gutter={8} style={{ marginTop: 8 }}>
                   <Col span={12}><Statistic title="总损耗" value={compareSummary.pTotal.toFixed(0)} suffix="W" valueStyle={{ fontSize: 18 }} /></Col>
                   <Col span={12}><Statistic title="效率" value={compareSummary.efficiency.toFixed(1)} suffix="%" valueStyle={{ fontSize: 18 }} /></Col>
-                  <Col span={12}><Statistic title="Tj_max" value={`${compareSummary.tJMax.toFixed(1)}°C`} valueStyle={{ fontSize: 16, color: compareSummary.tJMax > (config?.t_j_max || 150) ? '#cf1322' : '#3f8600' }} /></Col>
+                  <Col span={12}><Statistic title="Tj_max" value={`${compareSummary.tJMax.toFixed(1)}°C`} valueStyle={{ fontSize: 16, color: compareSummary.tJMax > (activeConfig?.t_j_max || 150) ? '#cf1322' : '#3f8600' }} /></Col>
                   <Col span={12}><Statistic title="开关损耗" value={compareSummary.pSw.toFixed(0)} suffix="W" valueStyle={{ fontSize: 16 }} /></Col>
                 </Row>
               </Card>

@@ -1,5 +1,6 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { Slider, Typography, Statistic, Row, Col, Tag, Select, Tooltip } from 'antd';
+import type { ModuleConfig, OperatingConditions } from '../../types';
 const { Text } = Typography;
 const C = { blue: '#0984E3', green: '#00B894', orange: '#E17055', purple: '#6C5CE7', red: '#D63031', dark: '#2D3436', medium: '#636E72', light: '#DFE6E9' };
 
@@ -12,13 +13,27 @@ const DEVICE_PRESETS: Record<string, { label: string; eonBase: number; eoffBase:
   sic_d:   { label: 'SiC 单管 1200V/50A',   eonBase: 0.9, eoffBase: 0.6, rg: 5,  color: '#55EFC4', desc: 'Eon=0.9mJ Eoff=0.6mJ @50A' },
 };
 
-export default function SwitchingLossDiagram() {
-  const [device, setDevice] = useState('igbt_m');
+interface Props { config?: ModuleConfig; conditions?: OperatingConditions; }
+
+export default function SwitchingLossDiagram({ config, conditions }: Props) {
+  const initIc = config?.ic_rated ? Math.round(config.ic_rated * 0.6) : 100;
+  const initFsw = conditions?.f_sw ? Math.round(conditions.f_sw / 1000) : 4;
+  const initVdc = conditions?.vdc ?? 600;
+
+  const [device, setDevice] = useState(config?.device_type?.startsWith('sic') ? 'sic_m' : 'igbt_m');
   const preset = DEVICE_PRESETS[device];
-  const [ic, setIc] = useState(100);
-  const [fsw, setFsw] = useState(4);
+  const [ic, setIc] = useState(initIc);
+  const [fsw, setFsw] = useState(initFsw);
   const [rg, setRg] = useState(preset.rg);
-  const [vdc, setVdc] = useState(600);
+  const [vdc, setVdc] = useState(initVdc);
+
+  useEffect(() => {
+    if (config) { setIc(initIc); setVdc(initVdc); }
+  }, [config?.ic_rated, conditions?.vdc]);
+
+  useEffect(() => {
+    if (conditions?.f_sw) setFsw(Math.round(conditions.f_sw / 1000));
+  }, [conditions?.f_sw]);
 
   const handleDeviceChange = (key: string) => {
     setDevice(key);

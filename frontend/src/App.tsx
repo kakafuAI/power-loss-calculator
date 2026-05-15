@@ -152,6 +152,11 @@ export default function App() {
       rth_ch_module: devConfig.rth_ch_module ?? 0.02,
       rth_ha: devConfig.rth_ha ?? 0.08,
     };
+    // Normalize switching points — accepts [{current, energy}, ...] or [[x,y], ...]
+    const normPts = (pts: any[]) => pts?.map((p: any) =>
+      typeof p.current === 'number' ? p : { current: Number(p[0]) || 0, energy: Number(p[1]) || 0 }
+    ) || [];
+
     // Ensure sub-objects have required nested fields
     if (filled.igbt) {
       filled.igbt = {
@@ -159,21 +164,24 @@ export default function App() {
         vce_sat_125: filled.igbt.vce_sat_125 ?? 2.0,
         ic_nom: filled.igbt.ic_nom ?? 100,
         vce_rated: filled.igbt.vce_rated ?? 1200,
-        eon_curve: { vcc: 600, rg: 10, tj: 125, points: filled.igbt.eon_curve?.points?.length ? filled.igbt.eon_curve.points : [{ current: 100, energy: 15 }] },
-        eoff_curve: { vcc: 600, rg: 10, tj: 125, points: filled.igbt.eoff_curve?.points?.length ? filled.igbt.eoff_curve.points : [{ current: 100, energy: 10 }] },
+        eon_curve: { vcc: filled.igbt.eon_curve?.vcc ?? 600, rg: filled.igbt.eon_curve?.rg ?? 10, tj: filled.igbt.eon_curve?.tj ?? 125, points: normPts(filled.igbt.eon_curve?.points) },
+        eoff_curve: { vcc: filled.igbt.eoff_curve?.vcc ?? 600, rg: filled.igbt.eoff_curve?.rg ?? 10, tj: filled.igbt.eoff_curve?.tj ?? 125, points: normPts(filled.igbt.eoff_curve?.points) },
         thermal: { rth_jc: filled.igbt.thermal?.rth_jc ?? 0.24 },
         rg_int: filled.igbt.rg_int,
       };
+      if (!filled.igbt.eon_curve.points.length) filled.igbt.eon_curve.points = [{ current: 100, energy: 15 }];
+      if (!filled.igbt.eoff_curve.points.length) filled.igbt.eoff_curve.points = [{ current: 100, energy: 10 }];
     }
     if (filled.diode) {
       filled.diode = {
         vf_25: filled.diode.vf_25 ?? 1.8,
         vf_125: filled.diode.vf_125 ?? 1.6,
         if_nom: filled.diode.if_nom ?? 100,
-        err_curve: { vcc: 600, rg: 10, tj: 125, points: filled.diode.err_curve?.points?.length ? filled.diode.err_curve.points : [{ current: 100, energy: 8 }] },
+        err_curve: { vcc: filled.diode.err_curve?.vcc ?? 600, rg: filled.diode.err_curve?.rg ?? 10, tj: filled.diode.err_curve?.tj ?? 125, points: normPts(filled.diode.err_curve?.points) },
         qrr: filled.diode.qrr ?? 5,
         thermal: { rth_jc: filled.diode.thermal?.rth_jc ?? 0.42 },
       };
+      if (!filled.diode.err_curve.points.length) filled.diode.err_curve.points = [{ current: 100, energy: 8 }];
     }
     if (filled.sic_mos) {
       filled.sic_mos = {
@@ -181,11 +189,13 @@ export default function App() {
         rds_on_125: filled.sic_mos.rds_on_125 ?? 35,
         id_nom: filled.sic_mos.id_nom ?? 100,
         vds_rated: filled.sic_mos.vds_rated ?? 1200,
-        eon_curve: { vcc: 800, rg: 5, tj: 150, points: filled.sic_mos.eon_curve?.points?.length ? filled.sic_mos.eon_curve.points : [{ current: 100, energy: 2 }] },
-        eoff_curve: { vcc: 800, rg: 5, tj: 150, points: filled.sic_mos.eoff_curve?.points?.length ? filled.sic_mos.eoff_curve.points : [{ current: 100, energy: 1.5 }] },
+        eon_curve: { vcc: filled.sic_mos.eon_curve?.vcc ?? 800, rg: filled.sic_mos.eon_curve?.rg ?? 5, tj: filled.sic_mos.eon_curve?.tj ?? 150, points: normPts(filled.sic_mos.eon_curve?.points) },
+        eoff_curve: { vcc: filled.sic_mos.eoff_curve?.vcc ?? 800, rg: filled.sic_mos.eoff_curve?.rg ?? 5, tj: filled.sic_mos.eoff_curve?.tj ?? 150, points: normPts(filled.sic_mos.eoff_curve?.points) },
         thermal: { rth_jc: filled.sic_mos.thermal?.rth_jc ?? 0.2 },
         rg_int: filled.sic_mos.rg_int,
       };
+      if (!filled.sic_mos.eon_curve.points.length) filled.sic_mos.eon_curve.points = [{ current: 100, energy: 2 }];
+      if (!filled.sic_mos.eoff_curve.points.length) filled.sic_mos.eoff_curve.points = [{ current: 100, energy: 1.5 }];
     }
     if (filled.sic_diode) {
       filled.sic_diode = {
@@ -198,6 +208,14 @@ export default function App() {
     }
     setConfig(filled);
     setResult(null);
+    // Auto-set conditions based on device ratings (#5)
+    const ratedVdc = filled.vdc_rated || 1200;
+    const ratedIc = filled.ic_rated || 100;
+    setConditions(prev => ({
+      ...prev,
+      vdc: Math.round(ratedVdc * 0.5),
+      i_out_rms: Math.round(ratedIc * 0.5),
+    }));
     setCurrentPage('calculate');
     setCurrentStep(2);
     message.success(`已加载器件: ${filled.module_name || filled.manufacturer || '未知器件'}`);
@@ -240,7 +258,7 @@ export default function App() {
     switch (currentPage) {
       case 'calculate': return renderCalculator();
       case 'devices': return <DeviceLibrary onSelect={handleSelectDevice} conditions={conditions} />;
-      case 'concepts': return <ConceptExplorer conditions={conditions} />;
+      case 'concepts': return <ConceptExplorer config={config} conditions={conditions} />;
       case 'history': return <CalculationHistory onSelect={handleSelectDevice} conditions={conditions} />;
       case 'compare': return <ComparisonView result={result} config={config} conditions={conditions} />;
       case 'demo': return <ConceptDemoCompare />;

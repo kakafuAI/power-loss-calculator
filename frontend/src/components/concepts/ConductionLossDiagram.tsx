@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Slider, Typography, Tag, Statistic, Row, Col, Tooltip, Select } from 'antd';
+import type { ModuleConfig, OperatingConditions } from '../../types';
 const { Text } = Typography;
 const C = { blue: '#0984E3', green: '#00B894', orange: '#E17055', purple: '#6C5CE7', red: '#D63031', dark: '#2D3436', medium: '#636E72', light: '#DFE6E9' };
 
@@ -11,6 +12,8 @@ const DEVICE_PRESETS: Record<string, { label: string; ic: number; vce: number; v
   sic_d:   { label: 'SiC 单管 1200V/50A',   ic: 40, vce: 0.04, vf: 1.2, duty: 0.65, color: '#55EFC4' },
 };
 
+interface Props { config?: ModuleConfig; conditions?: OperatingConditions; }
+
 // Half-bridge conduction states
 const STATES = [
   { key: 0, label: 'T1 导通', color: 'blue', desc: '上管IGBT/SiC导通', loss: (vce: number, ic: number, duty: number, isSiC: boolean) => isSiC ? ic*ic*vce*duty : vce*ic*duty },
@@ -20,16 +23,30 @@ const STATES = [
   { key: 4, label: 'D2 续流', color: 'green', desc: '下管反并联二极管续流', loss: (vce: number, ic: number, duty: number, isSiC: boolean, vf: number) => vf*ic*(1-duty) },
 ];
 
-export default function ConductionLossDiagram() {
-  const [device, setDevice] = useState('igbt_m');
+export default function ConductionLossDiagram({ config, conditions }: Props) {
+  const isDeviceSiC = config?.device_type?.startsWith('sic');
+  const isDeviceIGBT = config?.device_type?.startsWith('igbt') || config?.device_type === 'ipm_module';
+  const initIc = conditions?.i_out_rms ? Math.round(conditions.i_out_rms * 1.4) : (config?.ic_rated ? Math.round(config.ic_rated * 0.6) : 80);
+  const initVce = isDeviceSiC ? 0.02 : ((config?.igbt?.vce_sat_125) ?? 2.0);
+  const initVf = isDeviceSiC ? ((config?.sic_diode?.vsd_125) ?? 1.35) : ((config?.diode?.vf_125) ?? 1.7);
+  const initDuty = 0.70;
+
+  const [device, setDevice] = useState(isDeviceSiC ? 'sic_m' : 'igbt_m');
   const preset = DEVICE_PRESETS[device];
   const [state, setState] = useState(0);
-  const [duty, setDuty] = useState(preset.duty);
-  const [ic, setIc] = useState(preset.ic);
-  const [vce, setVce] = useState(preset.vce);
-  const [vf, setVf] = useState(preset.vf);
+  const [duty, setDuty] = useState(initDuty);
+  const [ic, setIc] = useState(initIc);
+  const [vce, setVce] = useState(initVce);
+  const [vf, setVf] = useState(initVf);
   const [off, setOff] = useState(0);
   useEffect(() => { const id = requestAnimationFrame(function l() { setOff(p => (p + 0.4) % 40); requestAnimationFrame(l); }); return () => cancelAnimationFrame(id); }, []);
+
+  // Sync with actual device config
+  useEffect(() => {
+    if (config) {
+      setIc(initIc); setVce(initVce); setVf(initVf);
+    }
+  }, [config?.igbt?.vce_sat_125, config?.sic_mos?.rds_on_125, config?.diode?.vf_125, config?.sic_diode?.vsd_125, config?.ic_rated]);
 
   const handleDeviceChange = (key: string) => {
     setDevice(key); const p = DEVICE_PRESETS[key];
